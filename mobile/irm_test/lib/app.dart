@@ -15,9 +15,9 @@ class _AppState extends State<App> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    bloc??=BlocProvider.of(context).appBloc;
-
+    bloc ??= BlocProvider.of(context).appBloc;
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -28,9 +28,10 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
       initialRoute: '/',
-      routes:{
-        '/':(context)=>HomePage(),
+      routes: {
+        '/': (context) => HomePage(),
       },
+      theme: ThemeData.dark(),
     );
   }
 }
