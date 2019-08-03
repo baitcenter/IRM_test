@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
 import 'package:irm_test/agenda/agenda_bloc.dart';
+import 'package:irm_test/in_app_calendar/in_app_calendar.dart';
 
 class Agenda extends StatefulWidget {
   @override
@@ -29,40 +30,31 @@ class _AgendaState extends State<Agenda> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        StreamedWidget(
-          noDataChild: Container(color: Colors.amber),
-          stream: _agendaBloc.calendars,
-          builder: (context, snapshot) {
-            print('snapshot: ${snapshot.data}');
-            if (snapshot.data.length != 0) {
-              return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: snapshot.data.length ?? 1,
-                  itemBuilder: (context, position) {
-                    return RawMaterialButton(
-                      fillColor: Colors.pink,
-                      child: Text(
-                        snapshot.data[position].name,
-                      ),
-                      onPressed: () {
-                        _agendaBloc.selectCalendar(snapshot.data[position]);
-                      },
-                    );
-                  });
-            }
-            return Container(color: Colors.purple);
-          },
-        ),
-        SizedBox(height: 20),
-        Container(
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text('please select calendar',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                )),
+        Expanded(
+          flex: 1,
+          child: StreamedWidget(
+            noDataChild: Container(color: Colors.amber),
+            stream: _agendaBloc.calendars,
+            builder: (context, snapshot) {
+              print('snapshot: ${snapshot.data}');
+              if (snapshot.data.length != 0) {
+                return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: snapshot.data.length ?? 1,
+                    itemBuilder: (context, position) {
+                      return RawMaterialButton(
+                        fillColor: Colors.pink,
+                        child: Text(
+                          snapshot.data[position].name,
+                        ),
+                        onPressed: () {
+                          _agendaBloc.selectCalendar(snapshot.data[position]);
+                        },
+                      );
+                    });
+              }
+              return Container(color: Colors.purple);
+            },
           ),
         ),
         SizedBox(height: 20),
@@ -90,6 +82,7 @@ class _AgendaState extends State<Agenda> {
                 ),
               );
             }),
+        Expanded(flex: 3, child: InAppCalendar()),
       ],
     );
   }
