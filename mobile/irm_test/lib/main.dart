@@ -11,7 +11,7 @@ void main() {
   var calendarService = CalendarServiceFake();
   var agendaBloc = AgendaBloc();
   var appBloc = AppBloc(authService, agendaBloc);
-  var calendarBloc = CalendarBloc(calendarService);
+  var calendarBloc = CalendarBloc(calendarService, agendaBloc);
 
   runApp(ServiceProvider(
       authService: authService,

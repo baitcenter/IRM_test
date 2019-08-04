@@ -2,22 +2,27 @@ import 'dart:async';
 
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
+import 'package:irm_test/blocs/agenda_bloc.dart';
 import 'package:irm_test/services.dart';
 
 //this bloc manages events
 class CalendarBloc {
   final CalendarService _calendarService;
-
-  CalendarBloc(this._calendarService) {
+  final AgendaBloc _agendaBloc;
+//TO DO consider merging AgendaBloc and CalendarBloc
+  CalendarBloc(this._calendarService, this._agendaBloc) {
     //initialize events
     checkToday = today.listen((today) {
-      _calendarService.getEvents(today).then((events) {
-        print('calendar bloc events initialized: $events}');
-        _events.value = events;
+      selectedCalendar = _agendaBloc.selectedCalendar.listen((calendar) {
+        _calendarService.getEvents(today, calendar.id).then((events) {
+          print('calendar bloc events initialized: $events}');
+          _events.value = events;
+        });
       });
     });
   }
 
+  StreamSubscription selectedCalendar;
   StreamSubscription checkToday;
   var _events = StreamedValue<Map<DateTime, List>>();
   var _today = StreamedValue<DateTime>();
