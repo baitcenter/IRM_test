@@ -127,11 +127,8 @@ class _InAppCalendarState extends State<InAppCalendar>
         ),
         const SizedBox(height: 8.0),
         RaisedButton(
-          child: Text('setDay 10-07-2019'),
-          onPressed: () {
-            _calendarController.setSelectedDay(DateTime(2019, 7, 10),
-                runCallback: true);
-          },
+          child: Text('create meeting'),
+          onPressed: () {},
         ),
       ],
     );
