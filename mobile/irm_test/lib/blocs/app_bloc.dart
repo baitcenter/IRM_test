@@ -61,6 +61,7 @@ class AppBloc {
   void inputPhoneNr(String userInput) {
     _phoneNr.inStream(userInput);
     print('phone input');
+    return;
   }
 
   ///TO DO prevent multiple clicking on button (add bool "is_loading")
@@ -87,16 +88,19 @@ class AppBloc {
     } catch (err) {
       print('error with confirmation code: ' + err);
     }
+    return;
   }
 
   void defineStep(StartUp step) {
     _currentStep.inStream(step);
+    return;
   }
 
   void signOut() {
     authService.signOut().then((_) {
       defineStep(StartUp.login);
     });
+    return;
   }
 
   dispose() {

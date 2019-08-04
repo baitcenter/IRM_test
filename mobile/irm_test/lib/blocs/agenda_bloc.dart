@@ -7,12 +7,13 @@ class AgendaBloc {
   var _calendars = StreamedValue<List<Calendar>>();
   var _selectedCalendar = StreamedValue<Calendar>();
 
-  Stream get calendars => _calendars.outStream;
-  Stream get selectedCalendar => _selectedCalendar.outStream;
+  Stream<List<Calendar>> get calendars => _calendars.outStream;
+  Stream<Calendar> get selectedCalendar => _selectedCalendar.outStream;
 
   void selectCalendar(Calendar calendar) {
     _selectedCalendar.value = calendar;
     print('calendar selected: ${_selectedCalendar.value.name}');
+    return;
   }
 
   void retrieveCalendars() async {
@@ -37,6 +38,7 @@ class AgendaBloc {
     } catch (e) {
       print(e);
     }
+    return;
   }
 
   void dispose() {

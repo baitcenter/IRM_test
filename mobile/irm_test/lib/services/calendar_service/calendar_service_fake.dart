@@ -1,6 +1,8 @@
+import 'package:device_calendar/device_calendar.dart';
 import 'package:irm_test/services.dart';
 
 class CalendarServiceFake extends CalendarService {
+  DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
   @override
   Future<Map<DateTime, List>> getEvents(DateTime today) async {
     // TODO: implement getEvents
@@ -61,5 +63,21 @@ class CalendarServiceFake extends CalendarService {
     };
     await Future.delayed(Duration(milliseconds: 500));
     return events;
+  }
+
+  @override
+  Future<bool> createEvent(Event event) async {
+    // TODO: implement createEvent
+    try {
+      Result result = await deviceCalendarPlugin.createOrUpdateEvent(event);
+      print('result: ${result.data}');
+      event.eventId = result.data;
+      //push to DB here
+      return result.isSuccess;
+    } catch (e) {
+      print(e);
+      print('error creating at webservice level');
+    }
+    return false;
   }
 }
