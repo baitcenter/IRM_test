@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:irm_test/create_event/create_event.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class InAppCalendar extends StatefulWidget {
@@ -128,7 +129,9 @@ class _InAppCalendarState extends State<InAppCalendar>
         const SizedBox(height: 8.0),
         RaisedButton(
           child: Text('create meeting'),
-          onPressed: () {},
+          onPressed: () {
+            _goToCreateEvent(context);
+          },
         ),
       ],
     );
@@ -151,5 +154,10 @@ class _InAppCalendarState extends State<InAppCalendar>
               ))
           .toList(),
     );
+  }
+
+  void _goToCreateEvent(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => CreateEvent()));
   }
 }
