@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:irm_test/app_bloc.dart';
-import 'package:irm_test/bloc_provider.dart';
+import 'package:irm_test/blocs/app_bloc.dart';
+import 'package:irm_test/blocs/bloc_provider.dart';
 import 'package:irm_test/login/login_screen.dart';
-
 
 class LoginPageBuilder {
   final LoginSteps step;
