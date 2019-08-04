@@ -30,7 +30,7 @@ class _CreateEventState extends State<CreateEvent> {
       appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
+        child: ListView(
           children: <Widget>[
             FieldString(
               hintTextKey: 'choose a title',
@@ -53,18 +53,20 @@ class _CreateEventState extends State<CreateEvent> {
               updater: _calendarBloc.updateEventDescription,
             ),
             _dateFields(
-                startOrEndDate: 'start date',
-                updaterDate: null,
-                startOrEndTime: 'start time',
-                updaterTime: null),
+              startOrEndDate: 'start date',
+              updaterDate: _calendarBloc.updateEventStartDate,
+              startOrEndTime: 'start time',
+              updaterTime: _calendarBloc.updateEventStartTime,
+            ),
             SizedBox(height: 20),
             _dateFields(
-                startOrEndDate: 'end date',
-                updaterDate: null,
-                startOrEndTime: 'end time',
-                updaterTime: null),
-            _confirmButton(),
-            _backButton(context), // TO DO: check redundancy with appBar
+              startOrEndDate: 'end date',
+              updaterDate: _calendarBloc.updateEventEndDate,
+              startOrEndTime: 'end time',
+              updaterTime: _calendarBloc.updateEventEndTime,
+            ),
+            _confirmButton(context),
+            //_backButton(context), // TO DO: check redundancy with appBar
           ],
         ),
       ),
@@ -103,11 +105,12 @@ class _CreateEventState extends State<CreateEvent> {
     );
   }
 
-  Widget _confirmButton() {
+  Widget _confirmButton(BuildContext context) {
     return StreamedWidget(
+        noDataChild: Container(color: Colors.pink),
         stream: _agendaBloc.selectedCalendar,
         builder: (context, calendarSnapshot) {
-          return RawMaterialButton(
+          return RaisedButton(
             child: Text('save event'),
             //TO DO: prevent multiple button presses for same event
             onPressed: () {

@@ -31,7 +31,7 @@ class AgendaBloc {
       Result<List<Calendar>> calendarsResult =
           await _deviceCalendarPlugin.retrieveCalendars();
       print('calendars retrieved');
-      _calendars.inStream(calendarsResult.data);
+      _calendars.value = calendarsResult.data;
       print('inStream');
       print(calendarsResult.data.toString());
       print('ola');

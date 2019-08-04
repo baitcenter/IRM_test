@@ -58,6 +58,7 @@ class _FieldDateState extends State<FieldDate> {
             keyboardType: TextInputType.number,
             onChanged: (date) {
               print(date);
+              print(date.length);
               if (date.length == widget.controlLength) {
                 widget.updater(date);
               }
