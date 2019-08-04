@@ -29,7 +29,7 @@ class _CalendarSelectState extends State<CalendarSelect> {
           if (snapshot.data.length != 0) {
             return ListView.builder(
                 shrinkWrap: true,
-                itemCount: snapshot.data.length ?? 1,
+                itemCount: snapshot.data.length,
                 itemBuilder: (context, position) {
                   return RawMaterialButton(
                     fillColor: Colors.pink,

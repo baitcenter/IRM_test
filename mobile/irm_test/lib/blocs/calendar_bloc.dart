@@ -24,8 +24,10 @@ class CalendarBloc {
   var _eventTitle = StreamedValue<String>()..inStream('');
   var _eventLocation = StreamedValue<String>()..inStream('');
   var _eventDescription = StreamedValue<String>()..inStream('');
-  var _eventStart = StreamedValue<DateTime>();
-  var _eventEnd = StreamedValue<DateTime>();
+  var _eventStartDate = StreamedValue<String>();
+  var _eventStartTime = StreamedValue<String>();
+  var _eventEndDate = StreamedValue<String>();
+  var _eventEndTime = StreamedValue<String>();
   var _eventAttendees = StreamedValue<Attendee>();
 
   Stream<Map<DateTime, List>> get events => _events.outStream;
@@ -48,6 +50,27 @@ class CalendarBloc {
     return;
   }
 
+  void updateEventStartDate(String startDate) {
+    _eventStartDate.value = startDate;
+    print('start date updated: ${_eventStartDate.value}');
+    return;
+  }
+
+  void updateEventStartTime(String startTime) {
+    _eventStartTime.value = startTime;
+    return;
+  }
+
+  void updateEventEndDate(String endDate) {
+    _eventEndDate.value = endDate;
+    return;
+  }
+
+  void updateEventEndTime(String endTime) {
+    _eventEndTime.value = endTime;
+    return;
+  }
+
   void getEvents(Map<DateTime, List> events) {
     _events.value = events;
     return;
@@ -58,19 +81,47 @@ class CalendarBloc {
     return;
   }
 
+  DateTime convertStringsToDate(String dateString, String timeString) {
+    try {
+      print('date fallback : ${DateTime.parse('0000-00-00 00:00:00')}');
+      print('dateString: $dateString');
+      print('timeString: $timeString');
+      DateTime convertedDate = DateTime.parse('${dateString[6]}'
+          '${dateString[7]}'
+          '${dateString[8]}'
+          '${dateString[9]}-'
+          '${dateString[3]}'
+          '${dateString[4]}-'
+          '${dateString[0]}'
+          '${dateString[1]} '
+          '${timeString[0]}'
+          '${timeString[1]}'
+          '${timeString[2]}'
+          '${timeString[3]}'
+          '${timeString[4]}'
+          ':00');
+      return convertedDate;
+    } catch (e) {
+      print('date conversion error:$e');
+      return DateTime.parse('0000-00-00 00:00:00');
+    }
+  }
+
   void createEvent(String calendarId) async {
     //get all event info from streams
-    var now = DateTime.now();
+    var startDateAndTime =
+        convertStringsToDate(_eventStartDate.value, _eventStartTime.value);
+    var endDateAndTime =
+        convertStringsToDate(_eventEndDate.value, _eventEndTime.value);
 
+//TO DO: put location in description as workaround to library shortcoming
     var event = Event(
       calendarId,
-      title: _eventTitle.value ?? 'No Title',
-      start: now.add(Duration(hours: 1)),
-      end: now.add(Duration(hours: 2)),
-      description: 'testing this shit out',
-    );
-    // values have to be set separately bc library don't put them in the constructor
-    event.location = _eventLocation.value ?? 'No location specified';
+      title: _eventTitle.value,
+      start: startDateAndTime,
+      end: endDateAndTime,
+      description: _eventDescription.value,
+    )..location = _eventLocation.value;
 
     try {
       bool isCreated = await _calendarService.createEvent(event);
@@ -93,8 +144,10 @@ class CalendarBloc {
     _eventTitle.dispose();
     _eventLocation.dispose();
     _eventDescription.dispose();
-    _eventStart.dispose();
-    _eventEnd.dispose();
+    _eventStartDate.dispose();
+    _eventEndDate.dispose();
+    _eventStartTime.dispose();
+    _eventEndTime.dispose();
     _eventAttendees.dispose();
     checkToday.cancel();
   }
