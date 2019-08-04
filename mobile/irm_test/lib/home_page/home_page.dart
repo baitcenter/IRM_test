@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
 import 'package:irm_test/agenda/agenda.dart';
-import 'package:irm_test/app_bloc.dart';
-import 'package:irm_test/bloc_provider.dart';
+import 'package:irm_test/blocs/app_bloc.dart';
+import 'package:irm_test/blocs/bloc_provider.dart';
+import 'package:irm_test/calendar_select/calendar_select.dart';
 import 'package:irm_test/login/login_builder.dart';
 import 'package:irm_test/login/login_screen.dart';
 
@@ -47,8 +48,12 @@ class _HomePageState extends State<HomePage> {
                       LoginPageBuilder(step: LoginSteps.sms, context: context)
                           .make();
                   break;
-                case StartUp.home:
+                case StartUp.calendarSelect:
+                  page = CalendarSelect();
+                  break;
+                case StartUp.agenda:
                   page = Agenda();
+                  // page = CalendarSample();
                   break;
                 default:
                   page = Container(
