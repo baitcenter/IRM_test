@@ -23,6 +23,7 @@ class CalendarBloc {
   var _today = StreamedValue<DateTime>();
   var _eventTitle = StreamedValue<String>()..inStream('');
   var _eventLocation = StreamedValue<String>()..inStream('');
+  var _eventDescription = StreamedValue<String>()..inStream('');
   var _eventStart = StreamedValue<DateTime>();
   var _eventEnd = StreamedValue<DateTime>();
   var _eventAttendees = StreamedValue<Attendee>();
@@ -38,7 +39,12 @@ class CalendarBloc {
   }
 
   void updateEventLocation(String location) {
-    _eventTitle.value = location;
+    _eventLocation.value = location;
+    return;
+  }
+
+  void updateEventDescription(String description) {
+    _eventDescription.value = description;
     return;
   }
 
@@ -86,6 +92,7 @@ class CalendarBloc {
     _today.dispose();
     _eventTitle.dispose();
     _eventLocation.dispose();
+    _eventDescription.dispose();
     _eventStart.dispose();
     _eventEnd.dispose();
     _eventAttendees.dispose();
