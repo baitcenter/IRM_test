@@ -1,6 +1,7 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
 
+// This bloc manages calendar selection & authorization
 class AgendaBloc {
   DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
   var _calendars = StreamedValue<List<Calendar>>();
