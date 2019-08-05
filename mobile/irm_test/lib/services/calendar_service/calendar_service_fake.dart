@@ -80,4 +80,16 @@ class CalendarServiceFake extends CalendarService {
     }
     return false;
   }
+
+  @override
+  createEventInDB() {
+    // TODO: implement createEventInDB
+    return null;
+  }
+
+  @override
+  getEventsFromDB() {
+    // TODO: implement getEventsFromDB
+    return null;
+  }
 }
