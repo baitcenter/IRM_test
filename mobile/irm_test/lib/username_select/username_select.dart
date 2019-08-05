@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frideos/frideos.dart';
 import 'package:irm_test/blocs/app_bloc.dart';
 import 'package:irm_test/blocs/bloc_provider.dart';
 import 'package:irm_test/widgets/field_string.dart';
@@ -9,13 +10,13 @@ class UserNameSelect extends StatefulWidget {
 }
 
 class _UserNameSelectState extends State<UserNameSelect> {
-  AppBloc _appbloc;
+  AppBloc _appBloc;
 
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    _appbloc ??= BlocProvider.of(context).appBloc;
+    _appBloc ??= BlocProvider.of(context).appBloc;
   }
 
   @override
@@ -33,14 +34,25 @@ class _UserNameSelectState extends State<UserNameSelect> {
                   hintTextKey: 'Choose a user name',
                   labelTextKey: 'User name',
                   userData: '',
-                  updater: _appbloc.updateUserName,
+                  updater: _appBloc.updateUserName,
                 ),
               ),
             ),
+            _confirmButton(context),
             Spacer(flex: 1),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _confirmButton(BuildContext context) {
+    return RaisedButton(
+      child: Text('save user name'),
+      //TO DO: prevent multiple button presses for same event
+      onPressed: () {
+        _appBloc.defineStep(StartUp.calendarSelect);
+      },
     );
   }
 }
