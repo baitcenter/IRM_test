@@ -143,7 +143,7 @@ class _InAppCalendarState extends State<InAppCalendar>
           ? _selectedEvents
               .map((event) => _eventTile(
                     child: ListTile(
-                      title: Text(event.toString()),
+                      title: Text(event.title),
                       onTap: () => print(
                           '$event tapped!'), //TO DO: go to edit event + delete option
                     ),
