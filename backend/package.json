@@ -1,0 +1,20 @@
+{
+  "name": "irm_test",
+  "version": "1.0.0",
+  "description": "manage DB connections",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "firebase": "^6.3.4",
+    "mongodb": "^3.3.0-beta2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
