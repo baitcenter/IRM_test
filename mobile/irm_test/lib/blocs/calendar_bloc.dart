@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
+import 'package:intl/intl.dart';
 import 'package:irm_test/blocs/agenda_bloc.dart';
 import 'package:irm_test/services.dart';
 
@@ -139,14 +140,20 @@ class CalendarBloc {
   }
 
   Map<DateTime, List> convertListToMap(List<Event> eventList) {
-    Map<DateTime, List> eventMap = {};
+    var today = _today.value;
+    Map<DateTime, List> eventMap = {today: []};
     for (var event in eventList) {
-      List<Event> listEvent = [];
-      listEvent.add(event);
-      eventMap[event.start] = listEvent;
+      if (compareDates(today, event.start)) {
+        eventMap[today].add(event);
+      }
     }
 
     return eventMap;
+  }
+
+  bool compareDates(DateTime today, DateTime eventDate) {
+    return DateFormat('YYYYMMDD').format(today) ==
+        DateFormat('YYYYMMDD').format(eventDate);
   }
 
   void dispose() {
