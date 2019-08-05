@@ -10,12 +10,15 @@ void main() {
   var authService = AuthServiceFirebase();
   //var calendarService = CalendarServiceFake();
   var calendarService = CalendarServiceBackend();
+  var userService = UserServiceHttp('9994dbdf.ngrok.io', authService);
   var agendaBloc = AgendaBloc();
-  var appBloc = AppBloc(authService, agendaBloc);
+  var appBloc = AppBloc(authService, agendaBloc, userService);
   var calendarBloc = CalendarBloc(calendarService, agendaBloc);
 
   runApp(ServiceProvider(
       authService: authService,
+      calendarService: calendarService,
+      userService: userService,
       child: BlocProvider(
           appBloc: appBloc,
           agendaBloc: agendaBloc,

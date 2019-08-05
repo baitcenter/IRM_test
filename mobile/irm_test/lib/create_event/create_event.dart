@@ -115,8 +115,8 @@ class _CreateEventState extends State<CreateEvent> {
             //TO DO: prevent multiple button presses for same event
             onPressed: () {
               print('calendarID: ${calendarSnapshot.data.id}');
-              _calendarBloc.createEvent(
-                  calendarSnapshot.data.id); //Refactor: export in "builder"
+              _calendarBloc.createEvent(calendarSnapshot
+                  .data.id); //TO DO:Refactor: export in "builder"
             },
           );
         });

@@ -6,6 +6,7 @@ import 'package:irm_test/blocs/bloc_provider.dart';
 import 'package:irm_test/calendar_select/calendar_select.dart';
 import 'package:irm_test/login/login_builder.dart';
 import 'package:irm_test/login/login_screen.dart';
+import 'package:irm_test/username_select/username_select.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -47,6 +48,9 @@ class _HomePageState extends State<HomePage> {
                   page =
                       LoginPageBuilder(step: LoginSteps.sms, context: context)
                           .make();
+                  break;
+                case StartUp.userNameSelect:
+                  page = UserNameSelect();
                   break;
                 case StartUp.calendarSelect:
                   page = CalendarSelect();

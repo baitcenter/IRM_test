@@ -7,16 +7,30 @@ import 'package:irm_test/services.dart';
 class AppBloc {
   final AuthService authService;
   final AgendaBloc agendaBloc;
+  final UserService userService;
 
-  AppBloc(this.authService, this.agendaBloc) {
-    authService.getCurrentUser().then((user) {
-      if (user != null) {
-        defineStep(StartUp.calendarSelect);
-        calendarStream = agendaBloc.selectedCalendar.listen((calendar) {
-          if (calendar != null) {
-            defineStep(StartUp.agenda);
+  AppBloc(this.authService, this.agendaBloc, this.userService) {
+    authService.getCurrentUser().then((userFB) {
+      print(userFB.uid);
+      if (userFB.uid != null) {
+        //TO DO : fetch DB Data if null navigate to user settings else go straight to Agenda.
+        userService.getUser().then((user) {
+          print('user received');
+          if (user.userName == '') {
+            defineStep(StartUp.userNameSelect);
+          } else {
+            updateUserName(user.userName);
+          }
+          if (user.userName != '' && user.calendar != null) {
+            agendaBloc.selectCalendar(user.calendar);
           }
         });
+      }
+    });
+
+    calendarStream = agendaBloc.selectedCalendar.listen((calendar) {
+      if (calendar != null) {
+        defineStep(StartUp.agenda);
       }
     });
 
@@ -40,6 +54,7 @@ class AppBloc {
   StreamSubscription phoneNrStream;
   StreamSubscription smsStream;
   StreamSubscription calendarStream;
+  var _userName = StreamedValue<String>();
   var _currentStep = StreamedValue<StartUp>()..inStream(StartUp.login);
   var _phoneNr = StreamedValue<String>()..inStream('');
   var _submitPhoneButtonActive = StreamedValue<bool>()..inStream(false);
@@ -52,6 +67,13 @@ class AppBloc {
   Stream<bool> get smsButtonActive => _submitSMSButtonActive.stream;
 
   Stream<StartUp> get currentStep => _currentStep.outStream;
+
+  Stream<String> get userName => _userName.outStream;
+
+  void updateUserName(String userName) {
+    _userName.value = userName;
+    return;
+  }
 
   void inputSMS(String userInput) {
     _sms.inStream(userInput);
@@ -92,7 +114,7 @@ class AppBloc {
   }
 
   void defineStep(StartUp step) {
-    _currentStep.inStream(step);
+    _currentStep.value = step;
     return;
   }
 
@@ -104,16 +126,17 @@ class AppBloc {
   }
 
   dispose() {
+    calendarStream.cancel();
     phoneNrStream.cancel();
     smsStream.cancel();
-    calendarStream.cancel();
-    _phoneNr.dispose();
-    _submitPhoneButtonActive.dispose();
     _currentStep.dispose();
+    _phoneNr.dispose();
     _sms.dispose();
+    _submitPhoneButtonActive.dispose();
     _submitSMSButtonActive.dispose();
+    _userName.dispose();
     _verificationId.dispose();
   }
 }
 
-enum StartUp { login, confirm, calendarSelect, agenda }
+enum StartUp { login, confirm, calendarSelect, userNameSelect, agenda }
