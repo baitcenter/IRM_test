@@ -25,7 +25,6 @@ class _CalendarSelectState extends State<CalendarSelect> {
         noDataChild: Container(color: Colors.amber),
         stream: _agendaBloc.calendars,
         builder: (context, snapshot) {
-          print('snapshot: ${snapshot.data}');
           if (snapshot.data.length != 0) {
             return ListView.builder(
                 shrinkWrap: true,

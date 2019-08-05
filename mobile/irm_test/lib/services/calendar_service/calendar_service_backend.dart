@@ -8,7 +8,6 @@ class CalendarServiceBackend extends CalendarService {
   Future<bool> createEvent(Event event) async {
     try {
       Result result = await deviceCalendarPlugin.createOrUpdateEvent(event);
-      print('result: ${result.data}');
       event.eventId = result.data;
       //push to DB here
       return result.isSuccess;
@@ -20,17 +19,15 @@ class CalendarServiceBackend extends CalendarService {
   }
 
   @override
-  Future<Map<DateTime, List>> getEvents(
-      DateTime today, String calendarId) async {
+  Future<List<Event>> getEvents(DateTime today, String calendarId) async {
     //TO DO pass retrieveEventParams as parameter
     // TODO: implement getEvents
     RetrieveEventsParams retrieveEventsParams = RetrieveEventsParams(
         //TO DO input correct parameters
         startDate: DateTime.now(),
-        endDate: DateTime.now().add(Duration(days: 1)));
+        endDate: DateTime.now().add(Duration(days: 7)));
     Result result = await deviceCalendarPlugin.retrieveEvents(
         calendarId, retrieveEventsParams);
-    print(result.data);
-    return null;
+    return result.data;
   }
 }

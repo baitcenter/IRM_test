@@ -8,7 +8,8 @@ import 'package:irm_test/services.dart';
 
 void main() {
   var authService = AuthServiceFirebase();
-  var calendarService = CalendarServiceFake();
+  //var calendarService = CalendarServiceFake();
+  var calendarService = CalendarServiceBackend();
   var agendaBloc = AgendaBloc();
   var appBloc = AppBloc(authService, agendaBloc);
   var calendarBloc = CalendarBloc(calendarService, agendaBloc);

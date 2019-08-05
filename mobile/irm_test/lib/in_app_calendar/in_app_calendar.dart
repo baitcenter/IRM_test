@@ -139,21 +139,28 @@ class _InAppCalendarState extends State<InAppCalendar>
 
   Widget _buildEventList() {
     return ListView(
-      children: _selectedEvents
-          .map((event) => Container(
-                decoration: BoxDecoration(
-                  border: Border.all(width: 0.8),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                child: ListTile(
-                  title: Text(event.toString()),
-                  onTap: () => print(
-                      '$event tapped!'), //TO DO: go to edit event + delete option
-                ),
-              ))
-          .toList(),
+      children: _selectedEvents != null
+          ? _selectedEvents
+              .map((event) => _eventTile(
+                    child: ListTile(
+                      title: Text(event.toString()),
+                      onTap: () => print(
+                          '$event tapped!'), //TO DO: go to edit event + delete option
+                    ),
+                  ))
+              .toList()
+          : [_eventTile(child: ListTile(title: Text('No event found')))],
+    );
+  }
+
+  Widget _eventTile({@required Widget child}) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 0.8),
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: child,
     );
   }
 
