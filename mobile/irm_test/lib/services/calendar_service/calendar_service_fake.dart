@@ -4,8 +4,7 @@ import 'package:irm_test/services.dart';
 class CalendarServiceFake extends CalendarService {
   DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
   @override
-  Future<Map<DateTime, List>> getEvents(
-      DateTime today, String calendarId) async {
+  Future<List<Event>> getEvents(DateTime today, String calendarId) async {
     // TODO: implement getEvents
     final _selectedDay = today;
 
@@ -63,7 +62,7 @@ class CalendarServiceFake extends CalendarService {
       ],
     };
     await Future.delayed(Duration(milliseconds: 500));
-    return events;
+    return null;
   }
 
   @override

@@ -46,7 +46,6 @@ class _AgendaState extends State<Agenda> {
     return StreamedWidget(
         stream: _calendarBloc.events,
         builder: (context, snapshot) {
-          print('snapshot: ${snapshot.data}');
           return InAppCalendar(
             events: snapshot.data,
             today: today,

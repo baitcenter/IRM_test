@@ -12,12 +12,10 @@ class AgendaBloc {
 
   void selectCalendar(Calendar calendar) {
     _selectedCalendar.value = calendar;
-    print('calendar selected: ${_selectedCalendar.value.name}');
     return;
   }
 
   void retrieveCalendars() async {
-    print('retrieving calendars');
     //Retrieve user's calendars from mobile device
     //Request permissions first if they haven't been granted
     try {
@@ -30,11 +28,7 @@ class AgendaBloc {
       }
       Result<List<Calendar>> calendarsResult =
           await _deviceCalendarPlugin.retrieveCalendars();
-      print('calendars retrieved');
       _calendars.value = calendarsResult.data;
-      print('inStream');
-      print(calendarsResult.data.toString());
-      print('ola');
     } catch (e) {
       print(e);
     }

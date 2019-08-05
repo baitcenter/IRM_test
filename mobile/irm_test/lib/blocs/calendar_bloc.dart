@@ -15,8 +15,8 @@ class CalendarBloc {
     checkToday = today.listen((today) {
       selectedCalendar = _agendaBloc.selectedCalendar.listen((calendar) {
         _calendarService.getEvents(today, calendar.id).then((events) {
-          print('calendar bloc events initialized: $events}');
-          _events.value = events;
+          var eventsMap = convertListToMap(events);
+          _events.value = eventsMap;
         });
       });
     });
@@ -73,11 +73,6 @@ class CalendarBloc {
 
   void updateEventEndTime(String endTime) {
     _eventEndTime.value = endTime;
-    return;
-  }
-
-  void getEvents(Map<DateTime, List> events) {
-    _events.value = events;
     return;
   }
 
@@ -143,6 +138,17 @@ class CalendarBloc {
     return;
   }
 
+  Map<DateTime, List> convertListToMap(List<Event> eventList) {
+    Map<DateTime, List> eventMap = {};
+    for (var event in eventList) {
+      List<Event> listEvent = [];
+      listEvent.add(event);
+      eventMap[event.start] = listEvent;
+    }
+
+    return eventMap;
+  }
+
   void dispose() {
     _events.dispose();
     _today.dispose();
@@ -155,5 +161,6 @@ class CalendarBloc {
     _eventEndTime.dispose();
     _eventAttendees.dispose();
     checkToday.cancel();
+    selectedCalendar.cancel();
   }
 }
