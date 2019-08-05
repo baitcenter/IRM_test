@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
 import 'package:intl/intl.dart';
-import 'package:irm_test/blocs/agenda_bloc.dart';
+import 'package:irm_test/blocs/app_bloc.dart';
 import 'package:irm_test/blocs/bloc_provider.dart';
 import 'package:irm_test/blocs/calendar_bloc.dart';
 import 'package:irm_test/widgets/field_date.dart';
@@ -13,14 +13,14 @@ class CreateEvent extends StatefulWidget {
 }
 
 class _CreateEventState extends State<CreateEvent> {
-  AgendaBloc _agendaBloc;
+  AppBloc _appBloc;
   CalendarBloc _calendarBloc;
 
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    _agendaBloc ??= BlocProvider.of(context).agendaBloc;
+    _appBloc ??= BlocProvider.of(context).appBloc;
     _calendarBloc ??= BlocProvider.of(context).calendarBloc;
   }
 
@@ -108,7 +108,7 @@ class _CreateEventState extends State<CreateEvent> {
   Widget _confirmButton(BuildContext context) {
     return StreamedWidget(
         noDataChild: Container(color: Colors.pink),
-        stream: _agendaBloc.selectedCalendar,
+        stream: _appBloc.selectedCalendar,
         builder: (context, calendarSnapshot) {
           return RaisedButton(
             child: Text('save event'),

@@ -1,19 +1,16 @@
 import 'dart:async';
 
+import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
-import 'package:irm_test/blocs/agenda_bloc.dart';
 import 'package:irm_test/services.dart';
 
 class AppBloc {
   final AuthService authService;
-  final AgendaBloc agendaBloc;
   final UserService userService;
 
-  AppBloc(this.authService, this.agendaBloc, this.userService) {
+  AppBloc(this.authService, this.userService) {
     authService.getCurrentUser().then((userFB) {
-      print(userFB.uid);
       if (userFB.uid != null) {
-        //TO DO : fetch DB Data if null navigate to user settings else go straight to Agenda.
         userService.getUser().then((user) {
           print('user received');
           if (user.userName == '') {
@@ -22,13 +19,13 @@ class AppBloc {
             updateUserName(user.userName);
           }
           if (user.userName != '' && user.calendar != null) {
-            agendaBloc.selectCalendar(user.calendar);
+            selectCalendar(user.calendar);
           }
         });
       }
     });
 
-    calendarStream = agendaBloc.selectedCalendar.listen((calendar) {
+    calendarStream = selectedCalendar.listen((calendar) {
       if (calendar != null) {
         defineStep(StartUp.agenda);
       }
@@ -51,6 +48,7 @@ class AppBloc {
     });
   }
 
+  DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
   StreamSubscription phoneNrStream;
   StreamSubscription smsStream;
   StreamSubscription calendarStream;
@@ -61,6 +59,12 @@ class AppBloc {
   var _submitSMSButtonActive = StreamedValue<bool>()..inStream(false);
   var _verificationId = StreamedValue<String>();
   var _sms = StreamedValue<String>()..inStream('');
+  var _calendars = StreamedValue<List<Calendar>>();
+  var _selectedCalendar = StreamedValue<Calendar>();
+
+  Stream<List<Calendar>> get calendars => _calendars.outStream;
+
+  Stream<Calendar> get selectedCalendar => _selectedCalendar.outStream;
 
   Stream<bool> get submitButtonActive => _submitPhoneButtonActive.stream;
 
@@ -69,6 +73,31 @@ class AppBloc {
   Stream<StartUp> get currentStep => _currentStep.outStream;
 
   Stream<String> get userName => _userName.outStream;
+
+  void selectCalendar(Calendar calendar) {
+    _selectedCalendar.value = calendar;
+    return;
+  }
+
+  void retrieveCalendars() async {
+    //Retrieve user's calendars from mobile device
+    //Request permissions first if they haven't been granted
+    try {
+      var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
+      if (permissionsGranted.isSuccess && !permissionsGranted.data) {
+        permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
+        if (!permissionsGranted.isSuccess || !permissionsGranted.data) {
+          return;
+        }
+      }
+      Result<List<Calendar>> calendarsResult =
+          await _deviceCalendarPlugin.retrieveCalendars();
+      _calendars.value = calendarsResult.data;
+    } catch (e) {
+      print(e);
+    }
+    return;
+  }
 
   void updateUserName(String userName) {
     _userName.value = userName;
@@ -129,8 +158,10 @@ class AppBloc {
     calendarStream.cancel();
     phoneNrStream.cancel();
     smsStream.cancel();
+    _calendars.dispose();
     _currentStep.dispose();
     _phoneNr.dispose();
+    _selectedCalendar.dispose();
     _sms.dispose();
     _submitPhoneButtonActive.dispose();
     _submitSMSButtonActive.dispose();

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
-import 'package:irm_test/blocs/agenda_bloc.dart';
+import 'package:irm_test/blocs/app_bloc.dart';
 import 'package:irm_test/blocs/bloc_provider.dart';
 
 class CalendarSelect extends StatefulWidget {
@@ -9,21 +9,21 @@ class CalendarSelect extends StatefulWidget {
 }
 
 class _CalendarSelectState extends State<CalendarSelect> {
-  AgendaBloc _agendaBloc;
+  AppBloc _appBloc;
 
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    _agendaBloc ??= BlocProvider.of(context).agendaBloc;
-    _agendaBloc.retrieveCalendars();
+    _appBloc ??= BlocProvider.of(context).appBloc;
+    _appBloc.retrieveCalendars();
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamedWidget(
         noDataChild: Container(color: Colors.amber),
-        stream: _agendaBloc.calendars,
+        stream: _appBloc.calendars,
         builder: (context, snapshot) {
           if (snapshot.data.length != 0) {
             return ListView.builder(
@@ -36,7 +36,7 @@ class _CalendarSelectState extends State<CalendarSelect> {
                       snapshot.data[position].name,
                     ),
                     onPressed: () {
-                      _agendaBloc.selectCalendar(snapshot.data[position]);
+                      _appBloc.selectCalendar(snapshot.data[position]);
                     },
                   );
                 });
