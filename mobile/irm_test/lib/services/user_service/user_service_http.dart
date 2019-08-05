@@ -41,13 +41,15 @@ class UserServiceHttp extends UserService {
 
     var calendarJson = calendar.toJson();
 
-    var response = await http.post(uri, headers: {
-      'Content-Type': 'application/json',
-    }, body: {
-      "userName": userName,
-      "calendar": calendarJson.toString(),
-      "uid": firebaseUser.uid
-    });
+    var response = await http.post(uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "userName": userName,
+          "calendar": calendarJson,
+          "uid": firebaseUser.uid
+        }));
 
     if (response.statusCode == 200 && response.statusCode <= 300) {
       return true;

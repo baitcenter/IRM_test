@@ -9,6 +9,8 @@ class AppBloc {
   final UserService userService;
 
   AppBloc(this.authService, this.userService) {
+    //Check if user is logged in FB, then check if user and calendar have been set
+    //If so go straight to homepage/calendar
     authService.getCurrentUser().then((userFB) {
       if (userFB.uid != null) {
         userService.getUser().then((user) {
@@ -24,13 +26,14 @@ class AppBloc {
         });
       }
     });
-
+    //TO DO: refactor to delete this (legacy) listener
     calendarStream = selectedCalendar.listen((calendar) {
       if (calendar != null) {
         defineStep(StartUp.agenda);
       }
     });
 
+    //Small control for phone and SMS format
     phoneNrStream = _phoneNr.stream.listen((phoneNr) {
       if (phoneNr.length == 12) {
         _submitPhoneButtonActive.inStream(true);
@@ -74,6 +77,7 @@ class AppBloc {
 
   Stream<String> get userName => _userName.outStream;
 
+  //Retrieve and select Calendars
   void selectCalendar(Calendar calendar) {
     _selectedCalendar.value = calendar;
     return;
@@ -104,6 +108,19 @@ class AppBloc {
     return;
   }
 
+  //Create user in DB
+  //TO DO: use bool to inform user of request's success or failure
+  Future<bool> createUserInDB() async {
+    try {
+      await userService.createUser(_userName.value, _selectedCalendar.value);
+      return true;
+    } catch (e) {
+      print('error creating user: $e');
+      return false;
+    }
+  }
+
+  //Authentication
   void inputSMS(String userInput) {
     _sms.inStream(userInput);
     print('sms input');
@@ -142,15 +159,15 @@ class AppBloc {
     return;
   }
 
-  void defineStep(StartUp step) {
-    _currentStep.value = step;
-    return;
-  }
-
   void signOut() {
     authService.signOut().then((_) {
       defineStep(StartUp.login);
     });
+    return;
+  }
+
+  void defineStep(StartUp step) {
+    _currentStep.value = step;
     return;
   }
 

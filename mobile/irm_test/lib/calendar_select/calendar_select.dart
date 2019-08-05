@@ -36,7 +36,9 @@ class _CalendarSelectState extends State<CalendarSelect> {
                       snapshot.data[position].name,
                     ),
                     onPressed: () {
+                      //TO DO : save name and Calendar to DB
                       _appBloc.selectCalendar(snapshot.data[position]);
+                      _appBloc.createUserInDB();
                     },
                   );
                 });
