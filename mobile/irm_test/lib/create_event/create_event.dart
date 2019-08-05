@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:irm_test/blocs/app_bloc.dart';
 import 'package:irm_test/blocs/bloc_provider.dart';
 import 'package:irm_test/blocs/calendar_bloc.dart';
+import 'package:irm_test/create_event/create_event_bloc.dart';
+import 'package:irm_test/services.dart';
 import 'package:irm_test/widgets/field_attendee.dart';
 import 'package:irm_test/widgets/field_date.dart';
 import 'package:irm_test/widgets/field_string.dart';
@@ -16,6 +18,9 @@ class CreateEvent extends StatefulWidget {
 class _CreateEventState extends State<CreateEvent> {
   AppBloc _appBloc;
   CalendarBloc _calendarBloc;
+  CreateEventBloc _createEventBloc;
+  UserService _userService;
+  String dropdownValue;
 
   @override
   void didChangeDependencies() {
@@ -23,6 +28,8 @@ class _CreateEventState extends State<CreateEvent> {
     super.didChangeDependencies();
     _appBloc ??= BlocProvider.of(context).appBloc;
     _calendarBloc ??= BlocProvider.of(context).calendarBloc;
+    _userService ??= ServiceProvider.of(context).userService;
+    _createEventBloc ??= CreateEventBloc(_userService);
   }
 
   @override
@@ -104,11 +111,19 @@ class _CreateEventState extends State<CreateEvent> {
         ),
         FieldAttendee(
           onPressed: null,
-          onChanged: null,
+          onChanged: dropdownOnChanged,
           attendees: null,
+          dropdownValue: dropdownValue,
         ),
       ],
     );
+  }
+
+  void dropDownOnPressed() {}
+  void dropdownOnChanged(String newValue) {
+    setState(() {
+      dropdownValue = newValue;
+    });
   }
 
   Widget _confirmButton(BuildContext context) {

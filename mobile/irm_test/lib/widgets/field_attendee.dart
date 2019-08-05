@@ -4,15 +4,18 @@ class FieldAttendee extends StatefulWidget {
   final List<String> attendees;
   final Function onChanged;
   final Function onPressed;
+  final String dropdownValue;
 
   const FieldAttendee(
       {Key key,
       @required this.attendees,
       @required this.onChanged,
-      @required this.onPressed})
-      : assert(attendees != null),
-        assert(onChanged != null),
-        assert(onPressed != null),
+      @required this.onPressed,
+      @required this.dropdownValue})
+      : //assert(attendees != null),
+        //assert(onChanged != null),
+        //assert(onPressed != null),
+        //assert(dropdownValue != null),
         super(key: key);
   @override
   _FieldAttendeeState createState() => _FieldAttendeeState();
@@ -33,6 +36,7 @@ class _FieldAttendeeState extends State<FieldAttendee> {
           );
         }).toList(),
         onChanged: widget.onChanged,
+        value: widget.dropdownValue,
       ),
       RaisedButton(
         child: Text('Add attendee'),

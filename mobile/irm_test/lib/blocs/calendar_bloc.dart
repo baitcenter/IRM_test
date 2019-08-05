@@ -34,7 +34,7 @@ class CalendarBloc {
   var _eventStartTime = StreamedValue<String>();
   var _eventEndDate = StreamedValue<String>();
   var _eventEndTime = StreamedValue<String>();
-  var _eventAttendees = StreamedValue<Attendee>();
+  var _eventAttendees = StreamedValue<List<Attendee>>();
 
   Stream<Map<DateTime, List>> get events => _events.outStream;
   Stream<DateTime> get today => _today.outStream;
