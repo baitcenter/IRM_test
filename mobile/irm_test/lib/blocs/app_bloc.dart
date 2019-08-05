@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
 import 'package:irm_test/services.dart';
+import 'package:irm_test/services/user_service/user.dart';
 
 class AppBloc {
   final AuthService authService;
@@ -56,6 +57,7 @@ class AppBloc {
   StreamSubscription smsStream;
   StreamSubscription calendarStream;
   var _userName = StreamedValue<String>();
+  var _allUsers = StreamedValue<List<User>>();
   var _currentStep = StreamedValue<StartUp>()..inStream(StartUp.login);
   var _phoneNr = StreamedValue<String>()..inStream('');
   var _submitPhoneButtonActive = StreamedValue<bool>()..inStream(false);
@@ -76,6 +78,7 @@ class AppBloc {
   Stream<StartUp> get currentStep => _currentStep.outStream;
 
   Stream<String> get userName => _userName.outStream;
+  Stream<List<User>> get allUsers => _allUsers.outStream;
 
   //Retrieve and select Calendars
   void selectCalendar(Calendar calendar) {
@@ -117,6 +120,18 @@ class AppBloc {
     } catch (e) {
       print('error creating user: $e');
       return false;
+    }
+  }
+
+  void getAllUsersFromDB() async {
+    try {
+      var users = await userService.getAllUsers();
+      _allUsers.value = users;
+      print('all users: ${_allUsers.value}');
+      return;
+    } catch (e) {
+      print('error fetching users: $e');
+      return;
     }
   }
 

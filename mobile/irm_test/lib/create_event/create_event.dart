@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:irm_test/blocs/app_bloc.dart';
 import 'package:irm_test/blocs/bloc_provider.dart';
 import 'package:irm_test/blocs/calendar_bloc.dart';
+import 'package:irm_test/widgets/field_attendee.dart';
 import 'package:irm_test/widgets/field_date.dart';
 import 'package:irm_test/widgets/field_string.dart';
 
@@ -100,6 +101,11 @@ class _CreateEventState extends State<CreateEvent> {
             userData: '',
             updater: updaterTime,
           ),
+        ),
+        FieldAttendee(
+          onPressed: null,
+          onChanged: null,
+          attendees: null,
         ),
       ],
     );

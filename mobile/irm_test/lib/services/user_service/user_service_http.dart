@@ -10,10 +10,12 @@ class UserServiceHttp extends UserService {
 
   UserServiceHttp(this.host, this.authService);
 
+  //TO DO : refactor with getAllUsers to reduce code
   Future<User> getUser() async {
     var user = await authService.getCurrentUser();
+    Map<String, String> queryParameters = {'uid': user.uid};
 
-    Uri uri = Uri.https(host, '/getuser?uid=${user.uid}');
+    Uri uri = Uri.https(host, '/getuser', queryParameters);
 
     print('sending get request');
 
@@ -22,9 +24,11 @@ class UserServiceHttp extends UserService {
 
     if (response.statusCode == 200) {
       var jsonBody = json.decode(response.body);
-      var user = User.fromJson(jsonBody);
+      var userList =
+          List<User>.from(jsonBody.map((user) => User.fromJson(user)));
+      User result = userList[0];
       print('request ok, sending user');
-      return user;
+      return result;
     }
     print('request done: no user');
     return User(
@@ -55,5 +59,29 @@ class UserServiceHttp extends UserService {
       return true;
     }
     return false;
+  }
+
+  @override
+  Future<List<User>> getAllUsers() async {
+    Uri uri = Uri.https(host, '/getallusers');
+
+    print('sending get request: get all users');
+
+    var response =
+        await http.get(uri, headers: {'Content-Type': 'application/json'});
+
+    if (response.statusCode == 200) {
+      var jsonBody = json.decode(response.body);
+      if (jsonBody != []) {
+        var result =
+            List<User>.from(jsonBody.map((user) => User.fromJson(user)));
+        return result;
+      }
+      print('user list empty');
+      return null;
+    }
+    print('request done: no user');
+
+    return null;
   }
 }
