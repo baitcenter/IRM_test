@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
-import 'package:irm_test/agenda/agenda.dart';
-import 'package:irm_test/blocs/app_bloc.dart';
-import 'package:irm_test/blocs/bloc_provider.dart';
-import 'package:irm_test/calendar_select/calendar_select.dart';
-import 'package:irm_test/login/login_builder.dart';
-import 'package:irm_test/login/login_screen.dart';
-import 'package:irm_test/username_select/username_select.dart';
+import 'package:irm_test/startup/agenda/agenda.dart';
+import 'package:irm_test/startup/calendar_select/calendar_select.dart';
+import 'package:irm_test/startup/login/login_builder.dart';
+import 'package:irm_test/startup/login/login_screen.dart';
+import 'package:irm_test/z_blocs/app_bloc.dart';
+import 'package:irm_test/z_blocs/bloc_provider.dart';
+import 'package:irm_test/startup/username_select/username_select.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
               Widget page;
               switch (snapshot.data) {
 
-                ///TO DO add a start screen before login
+                ///TO DO add a start screen before a_startup.login
                 case StartUp.login:
                   page =
                       LoginPageBuilder(step: LoginSteps.phone, context: context)

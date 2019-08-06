@@ -1,5 +1,5 @@
 import 'package:device_calendar/device_calendar.dart';
-import 'package:irm_test/services/user_service/user.dart';
+import 'package:irm_test/z_services/user_service/user.dart';
 
 abstract class UserService {
   Future<User> getUser();

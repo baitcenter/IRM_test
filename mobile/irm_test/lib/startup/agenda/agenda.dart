@@ -1,10 +1,11 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
-import 'package:irm_test/blocs/bloc_provider.dart';
-import 'package:irm_test/blocs/calendar_bloc.dart';
-import 'package:irm_test/in_app_calendar/in_app_calendar.dart';
+import 'package:irm_test/calendar/in_app_calendar/in_app_calendar.dart';
+import 'package:irm_test/services.dart';
+import 'package:irm_test/startup/agenda/agenda_bloc.dart';
+import 'package:irm_test/z_blocs/app_bloc.dart';
+import 'package:irm_test/z_blocs/bloc_provider.dart';
 
 class Agenda extends StatefulWidget {
   @override
@@ -12,7 +13,9 @@ class Agenda extends StatefulWidget {
 }
 
 class _AgendaState extends State<Agenda> {
-  CalendarBloc _calendarBloc;
+  AgendaBloc _agendaBloc;
+  AppBloc _appBloc;
+  CalendarService _calendarService;
   StreamSubscription _eventsListener;
   DateTime today;
 
@@ -27,9 +30,14 @@ class _AgendaState extends State<Agenda> {
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    _calendarBloc ??= BlocProvider.of(context).calendarBloc;
-    _calendarBloc.setToday(today);
-    _eventsListener ??= _calendarBloc.events.listen((events) {
+    _appBloc = BlocProvider.of(context).appBloc;
+    _calendarService = ServiceProvider.of(context).calendarService;
+    _agendaBloc ??= AgendaBloc(
+      _calendarService,
+      _appBloc,
+    );
+    _agendaBloc.setToday(today);
+    _eventsListener ??= _agendaBloc.events.listen((events) {
       print('events:$events');
     });
   }
@@ -38,13 +46,14 @@ class _AgendaState extends State<Agenda> {
   void dispose() {
     // TODO: implement dispose
     _eventsListener.cancel();
+    _agendaBloc.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamedWidget(
-        stream: _calendarBloc.events,
+        stream: _agendaBloc.events,
         builder: (context, snapshot) {
           return InAppCalendar(
             events: snapshot.data,

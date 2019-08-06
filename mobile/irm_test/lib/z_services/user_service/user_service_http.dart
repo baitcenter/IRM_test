@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:device_calendar/device_calendar.dart';
 import 'package:http/http.dart' as http;
 import 'package:irm_test/services.dart';
-import 'package:irm_test/services/user_service/user.dart';
+import 'package:irm_test/z_services/user_service/user.dart';
 
 class UserServiceHttp extends UserService {
   final String host;
