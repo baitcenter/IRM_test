@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:irm_test/create_event/create_event.dart';
+import 'package:irm_test/calendar/create_event/create_event.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class InAppCalendar extends StatefulWidget {

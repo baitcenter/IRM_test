@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:irm_test/services/auth_service/auth_service.dart';
+import 'package:irm_test/z_services/auth_service/auth_service.dart';
 
-class AuthServiceFirebase extends AuthService{
-
+class AuthServiceFirebase extends AuthService {
   String token;
   DateTime tokenCreationDate;
   int tokenLifetimeInMinutes = 5;
@@ -19,7 +18,7 @@ class AuthServiceFirebase extends AuthService{
 
     PhoneVerificationFailed phoneVerificationFailed = (authException) {
       print('phone verification failed');
-      print (authException.message);
+      print(authException.message);
       c.completeError(Error());
     };
 
@@ -38,13 +37,14 @@ class AuthServiceFirebase extends AuthService{
   }
 
   @override
-  Future<UserAuthData> confirmSMSCode({String verificationId, String smsCode}) async{
+  Future<UserAuthData> confirmSMSCode(
+      {String verificationId, String smsCode}) async {
     final AuthCredential credential = PhoneAuthProvider.getCredential(
       verificationId: verificationId,
       smsCode: smsCode,
     );
     var firebaseUser =
-    await FirebaseAuth.instance.signInWithCredential(credential);
+        await FirebaseAuth.instance.signInWithCredential(credential);
     return UserAuthData(
         uid: firebaseUser.uid, phoneNr: firebaseUser.phoneNumber ?? '');
   }
@@ -70,11 +70,11 @@ class AuthServiceFirebase extends AuthService{
     return token;
   }
 
-  bool _tokenIsExpired(){
-    if (token==null)
-      return true;
-    if (token!=null && DateTime.now().difference(tokenCreationDate).abs().inMinutes>tokenLifetimeInMinutes)
-      return true;
+  bool _tokenIsExpired() {
+    if (token == null) return true;
+    if (token != null &&
+        DateTime.now().difference(tokenCreationDate).abs().inMinutes >
+            tokenLifetimeInMinutes) return true;
     return false;
   }
 

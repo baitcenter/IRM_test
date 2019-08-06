@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
 import 'package:intl/intl.dart';
-import 'package:irm_test/blocs/app_bloc.dart';
-import 'package:irm_test/blocs/bloc_provider.dart';
-import 'package:irm_test/blocs/calendar_bloc.dart';
-import 'package:irm_test/create_event/create_event_bloc.dart';
+import 'package:irm_test/calendar/create_event/create_event_bloc.dart';
 import 'package:irm_test/services.dart';
 import 'package:irm_test/widgets/field_attendee.dart';
 import 'package:irm_test/widgets/field_date.dart';
 import 'package:irm_test/widgets/field_string.dart';
+import 'package:irm_test/z_blocs/app_bloc.dart';
+import 'package:irm_test/z_blocs/bloc_provider.dart';
+import 'package:irm_test/z_services/service_provider.dart';
 
 class CreateEvent extends StatefulWidget {
   @override
@@ -17,9 +17,9 @@ class CreateEvent extends StatefulWidget {
 
 class _CreateEventState extends State<CreateEvent> {
   AppBloc _appBloc;
-  CalendarBloc _calendarBloc;
   CreateEventBloc _createEventBloc;
   UserService _userService;
+  CalendarService _calendarService;
   String dropdownValue;
 
   @override
@@ -27,9 +27,15 @@ class _CreateEventState extends State<CreateEvent> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     _appBloc ??= BlocProvider.of(context).appBloc;
-    _calendarBloc ??= BlocProvider.of(context).calendarBloc;
     _userService ??= ServiceProvider.of(context).userService;
-    _createEventBloc ??= CreateEventBloc(_userService);
+    _calendarService ??= ServiceProvider.of(context).calendarService;
+    _createEventBloc ??= CreateEventBloc(_userService, _calendarService);
+  }
+
+  @override
+  void dispose() {
+    _createEventBloc.dispose();
+    super.dispose();
   }
 
   @override
@@ -44,34 +50,34 @@ class _CreateEventState extends State<CreateEvent> {
               hintTextKey: 'choose a title',
               userData: '',
               labelTextKey: 'Title',
-              updater: _calendarBloc.updateEventTitle,
+              updater: _createEventBloc.updateEventTitle,
             ),
             SizedBox(height: 15),
             FieldString(
               hintTextKey: 'choose a location',
               userData: '',
               labelTextKey: 'location',
-              updater: _calendarBloc.updateEventLocation,
+              updater: _createEventBloc.updateEventLocation,
             ),
             SizedBox(height: 20),
             FieldString(
               hintTextKey: 'describe your event', //TO DO: limit characters
               userData: '',
               labelTextKey: 'Description',
-              updater: _calendarBloc.updateEventDescription,
+              updater: _createEventBloc.updateEventDescription,
             ),
             _dateFields(
               startOrEndDate: 'start date',
-              updaterDate: _calendarBloc.updateEventStartDate,
+              updaterDate: _createEventBloc.updateEventStartDate,
               startOrEndTime: 'start time',
-              updaterTime: _calendarBloc.updateEventStartTime,
+              updaterTime: _createEventBloc.updateEventStartTime,
             ),
             SizedBox(height: 20),
             _dateFields(
               startOrEndDate: 'end date',
-              updaterDate: _calendarBloc.updateEventEndDate,
+              updaterDate: _createEventBloc.updateEventEndDate,
               startOrEndTime: 'end time',
-              updaterTime: _calendarBloc.updateEventEndTime,
+              updaterTime: _createEventBloc.updateEventEndTime,
             ),
             _confirmButton(context),
             //_backButton(context), // TO DO: check redundancy with appBar
@@ -136,7 +142,7 @@ class _CreateEventState extends State<CreateEvent> {
             //TO DO: prevent multiple button presses for same event
             onPressed: () {
               print('calendarID: ${calendarSnapshot.data.id}');
-              _calendarBloc.createEvent(calendarSnapshot
+              _createEventBloc.createEvent(calendarSnapshot
                   .data.id); //TO DO:Refactor: export in "builder"
             },
           );

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:irm_test/blocs/app_bloc.dart';
-import 'package:irm_test/blocs/bloc_provider.dart';
-import 'package:irm_test/login/login_screen.dart';
+import 'package:irm_test/startup/login/login_bloc.dart';
+import 'package:irm_test/startup/login/login_screen.dart';
+import 'package:irm_test/z_blocs/app_bloc.dart';
+import 'package:irm_test/z_blocs/bloc_provider.dart';
 
 class LoginPageBuilder {
   final LoginSteps step;
@@ -11,21 +12,25 @@ class LoginPageBuilder {
 
   Widget make() {
     AppBloc appBloc = BlocProvider.of(context).appBloc;
+    LoginBloc loginBloc = LoginBloc(appBloc);
     Widget loginScreen;
     switch (step) {
       case LoginSteps.phone:
         loginScreen = LoginScreen(
-            submitButtonStream: appBloc.submitButtonActive,
-            inputData: appBloc.inputPhoneNr,
-            submitData: appBloc.submitPhoneNr,
-            hintText: 'Input phone number');
+          submitButtonStream: loginBloc.submitButtonActive,
+          inputData: appBloc.inputPhoneNr,
+          submitData: appBloc.submitPhoneNr,
+          hintText: 'Input phone number',
+          loginBloc: loginBloc,
+        );
         break;
       case LoginSteps.sms:
         loginScreen = LoginScreen(
-          submitButtonStream: appBloc.smsButtonActive,
+          submitButtonStream: loginBloc.smsButtonActive,
           inputData: appBloc.inputSMS,
           submitData: appBloc.confirmSMSCode,
           hintText: 'Confirm SMS code',
+          loginBloc: loginBloc,
         );
         break;
     }

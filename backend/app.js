@@ -33,8 +33,7 @@ app.get('/getuser',(req,res) => {
             res.status(418);
             throw err
         };
-        queryResult=result;
-        queryResult=JSON.stringify(queryResult);
+        queryResult=JSON.stringify(result);
         console.log(queryResult);
         res.status(200);
         return res.send(queryResult);
@@ -51,6 +50,21 @@ app.post('/createuser', (req,res)=> {
 
     })
 });
+
+app.get('/getallusers',(req,res)=>{
+    let queryResult=[];
+    myDB.collection('team').find( {} ).toArray(function(err,result){
+        if (err) {
+            res.status(418);
+            throw err
+        };
+        queryResult=JSON.stringify(result);
+        console.log(queryResult);
+        res.status(200);
+        return res.send(queryResult);
+    });
+});
+
 app.post('/updateuser',(req,res)=>res.send('update user details in MongoDB'));
 app.delete('/userdelete',(req,res)=>res.send('delete user in MongoDB'));
 
@@ -58,5 +72,16 @@ app.get('/getevent',(req,res) => res.send('Get event details from mongoDB'));
 app.post('/createevent', (req,res)=> res.send('Create new event in MongoDB'));
 app.post('/updateevent',(req,res)=>res.send('update event details in MongoDB'));
 app.delete('/eventdelete',(req,res)=>res.send('delete event in MongoDB'));
+
+function processResults(err,result){
+    if (err) {
+        res.status(418);
+        throw err
+    };
+    queryResult=JSON.stringify(result);
+    console.log(queryResult);
+    res.status(200);
+    return res.send(queryResult);
+}
 
 

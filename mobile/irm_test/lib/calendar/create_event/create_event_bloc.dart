@@ -1,32 +1,22 @@
-import 'dart:async';
-
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
-import 'package:intl/intl.dart';
-import 'package:irm_test/blocs/app_bloc.dart';
 import 'package:irm_test/services.dart';
+import 'package:irm_test/z_blocs/app_bloc.dart';
 
-//this bloc manages events
-class CalendarBloc {
+class CreateEventBloc {
+  final UserService userService;
   final CalendarService _calendarService;
-  final AppBloc _appBloc;
-//TO DO consider merging AgendaBloc and CalendarBloc
-  CalendarBloc(this._calendarService, this._appBloc) {
-    //initialize events
-    checkToday = today.listen((today) {
-      selectedCalendar = _appBloc.selectedCalendar.listen((calendar) {
-        _calendarService.getEvents(today, calendar.id).then((events) {
-          var eventsMap = convertListToMap(events);
-          _events.value = eventsMap;
-        });
-      });
-    });
+
+  CreateEventBloc(
+    this.userService,
+    this._calendarService,
+  ) {
+    getAllUsersFromDB();
   }
 
-  StreamSubscription selectedCalendar;
-  StreamSubscription checkToday;
-  var _events = StreamedValue<Map<DateTime, List>>();
-  var _today = StreamedValue<DateTime>();
+  var _allUsers = StreamedValue<List<User>>();
+  var _buttonPressed = StreamedValue<bool>()..value = false;
+
   var _eventTitle = StreamedValue<String>()..inStream('');
   var _eventLocation = StreamedValue<String>()..inStream('');
   var _eventDescription = StreamedValue<String>()..inStream('');
@@ -36,11 +26,30 @@ class CalendarBloc {
   var _eventEndTime = StreamedValue<String>();
   var _eventAttendees = StreamedValue<List<Attendee>>();
 
-  Stream<Map<DateTime, List>> get events => _events.outStream;
-  Stream<DateTime> get today => _today.outStream;
+  Stream<List<User>> get allUsers => _allUsers.outStream;
+  Stream<bool> get isButtonPressed => _buttonPressed.outStream;
+
   Stream<String> get eventTitle => _eventTitle.outStream;
   Stream<String> get eventLocation => _eventLocation.outStream;
 
+  void pressButtonState() {
+    _buttonPressed.value = !_buttonPressed.value;
+    return;
+  }
+
+  void getAllUsersFromDB() async {
+    try {
+      var users = await userService.getAllUsers();
+      _allUsers.value = users;
+      print('all users: ${_allUsers.value}');
+      return;
+    } catch (e) {
+      print('error fetching users: $e');
+      return;
+    }
+  }
+
+  //TO DO: test behavior of .InStream to make code more compact
   void updateEventTitle(String title) {
     _eventTitle.value = title;
     return;
@@ -74,11 +83,6 @@ class CalendarBloc {
 
   void updateEventEndTime(String endTime) {
     _eventEndTime.value = endTime;
-    return;
-  }
-
-  void setToday(DateTime today) {
-    _today.value = today;
     return;
   }
 
@@ -139,26 +143,9 @@ class CalendarBloc {
     return;
   }
 
-  Map<DateTime, List> convertListToMap(List<Event> eventList) {
-    var today = _today.value;
-    Map<DateTime, List> eventMap = {today: []};
-    for (var event in eventList) {
-      if (compareDates(today, event.start)) {
-        eventMap[today].add(event);
-      }
-    }
-
-    return eventMap;
-  }
-
-  bool compareDates(DateTime today, DateTime eventDate) {
-    return DateFormat('YYYYMMDD').format(today) ==
-        DateFormat('YYYYMMDD').format(eventDate);
-  }
-
-  void dispose() {
-    _events.dispose();
-    _today.dispose();
+  dispose() {
+    _buttonPressed.dispose();
+    _allUsers.dispose();
     _eventTitle.dispose();
     _eventLocation.dispose();
     _eventDescription.dispose();
@@ -167,7 +154,5 @@ class CalendarBloc {
     _eventStartTime.dispose();
     _eventEndTime.dispose();
     _eventAttendees.dispose();
-    checkToday.cancel();
-    selectedCalendar.cancel();
   }
 }
