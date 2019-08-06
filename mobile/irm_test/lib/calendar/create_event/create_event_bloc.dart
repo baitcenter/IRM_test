@@ -1,20 +1,20 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
 import 'package:irm_test/services.dart';
-import 'package:irm_test/z_blocs/app_bloc.dart';
+import 'package:irm_test/z_services/calendar_service/extended_event.dart';
 
 class CreateEventBloc {
   final UserService userService;
-  final CalendarService _calendarService;
+  final CalendarService calendarService;
 
   CreateEventBloc(
     this.userService,
-    this._calendarService,
-  );
+    this.calendarService,
+  ) {
+    getAllUsersFromDB();
+  }
 
   var _allUsers = StreamedValue<List<User>>();
-  var _buttonPressed = StreamedValue<bool>()..value = false;
-
   var _eventTitle = StreamedValue<String>()..inStream('');
   var _eventLocation = StreamedValue<String>()..inStream('');
   var _eventDescription = StreamedValue<String>()..inStream('');
@@ -24,19 +24,15 @@ class CreateEventBloc {
   var _eventEndTime = StreamedValue<String>();
   var _eventAttendees = StreamedValue<List<Attendee>>();
   var _attendeeNames = StreamedValue<List<String>>();
+  var _selectedAttendees = StreamedValue<List<User>>()..inStream(List<User>());
+  var _eventToSend = StreamedValue<Event>();
 
   Stream<List<User>> get allUsers => _allUsers.outStream;
-  Stream<bool> get isButtonPressed => _buttonPressed.outStream;
 
   Stream<String> get eventTitle => _eventTitle.outStream;
   Stream<String> get eventLocation => _eventLocation.outStream;
   Stream<List<Attendee>> get attendees => _eventAttendees.outStream;
   Stream<List<String>> get attendeeNames => _attendeeNames.outStream;
-
-  void pressButtonState() {
-    _buttonPressed.value = !_buttonPressed.value;
-    return;
-  }
 
   void getAllUsersFromDB() async {
     try {
@@ -62,19 +58,32 @@ class CreateEventBloc {
     }
   }
 
+  void addAttendee(String attendeeName) {
+    for (var user in _allUsers.value) {
+      if (user.userName == attendeeName) {
+        print(_selectedAttendees.value.length);
+        _selectedAttendees.value.add(user);
+        print(_selectedAttendees.value.length);
+      }
+    }
+  }
+
   //TO DO: test behavior of .InStream to make code more compact
   void updateEventTitle(String title) {
     _eventTitle.value = title;
+    print('title updated');
     return;
   }
 
   void updateEventLocation(String location) {
     _eventLocation.value = location;
+    print('location updated');
     return;
   }
 
   void updateEventDescription(String description) {
     _eventDescription.value = description;
+    print('description updated');
     return;
   }
 
@@ -86,22 +95,24 @@ class CreateEventBloc {
 
   void updateEventStartTime(String startTime) {
     _eventStartTime.value = startTime;
+    print('start time updated:${_eventStartTime.value}');
     return;
   }
 
   void updateEventEndDate(String endDate) {
     _eventEndDate.value = endDate;
+    print('end date updated: ${_eventEndDate.value}');
     return;
   }
 
   void updateEventEndTime(String endTime) {
     _eventEndTime.value = endTime;
+    print('endTime updated:${_eventEndTime.value}');
     return;
   }
 
   DateTime convertStringsToDate(String dateString, String timeString) {
     try {
-      print('date fallback : ${DateTime.parse('0000-00-00 00:00:00')}');
       print('dateString: $dateString');
       print('timeString: $timeString');
       DateTime convertedDate = DateTime.parse('${dateString[6]}'
@@ -125,12 +136,36 @@ class CreateEventBloc {
     }
   }
 
-  void createEvent(String calendarId) async {
+  void createEventInDbAndLocally(String calendarId) async {
+    var createdLocally = await createEvent(calendarId);
+    if (createdLocally) {
+      createEventInDb();
+      return;
+    }
+    print('error creating event in calendar and DB');
+  }
+
+  void testStreams() {
+    print(_eventStartDate.value);
+    print(_eventEndDate.value);
+    print(_eventEndTime.value);
+    print(_eventStartTime.value);
+    print(_eventTitle.value);
+    print(_eventDescription.value);
+    print(_selectedAttendees.value);
+    return;
+  }
+
+  Future<bool> createEvent(String calendarId) async {
     //get all event info from streams
+    print(_eventStartDate.value);
     var startDateAndTime =
         convertStringsToDate(_eventStartDate.value, _eventStartTime.value);
     var endDateAndTime =
         convertStringsToDate(_eventEndDate.value, _eventEndTime.value);
+
+    List<Attendee> calendarAttendees = List<Attendee>.from(
+        _selectedAttendees.value.map((user) => Attendee(user.userName)));
 
 //TO DO: put location in description as workaround to library shortcoming
     var event = Event(
@@ -139,25 +174,47 @@ class CreateEventBloc {
       start: startDateAndTime,
       end: endDateAndTime,
       description: _eventDescription.value,
-    )..location = _eventLocation.value;
+    )
+      ..location = _eventLocation.value
+      ..attendees = calendarAttendees;
+
+    _eventToSend.value = event;
 
     try {
-      bool isCreated = await _calendarService.createEvent(event);
+      bool isCreated = await calendarService.createEvent(event);
       if (isCreated) {
         print('event created');
-        return;
+        return true;
       }
       print('event not created');
-      return;
+      return false;
     } catch (e) {
       print(e);
       print('error creating event');
     }
-    return;
+    return false;
+  }
+
+  Future<bool> createEventInDb() async {
+    User owner = await userService.getUser();
+    List<User> guests = _selectedAttendees.value;
+    Event event = _eventToSend.value;
+    ExtendedEvent dbEvent =
+        ExtendedEvent(event: event, owner: owner, guests: guests);
+    try {
+      bool createdInDb = await calendarService.createEventInDB(dbEvent);
+      if (createdInDb) {
+        print('event created');
+        return createdInDb;
+      }
+      print('oops');
+      return createdInDb;
+    } catch (e) {
+      print('error creating event in DB:$e');
+    }
   }
 
   dispose() {
-    _buttonPressed.dispose();
     _allUsers.dispose();
     _attendeeNames.dispose();
     _eventTitle.dispose();
@@ -168,5 +225,7 @@ class CreateEventBloc {
     _eventStartTime.dispose();
     _eventEndTime.dispose();
     _eventAttendees.dispose();
+    _eventToSend.dispose();
+    _selectedAttendees.dispose();
   }
 }

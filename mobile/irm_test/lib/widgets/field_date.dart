@@ -61,6 +61,7 @@ class _FieldDateState extends State<FieldDate> {
               print(date.length);
               if (date.length == widget.controlLength) {
                 widget.updater(date);
+                print('field date onChanged called');
               }
             },
             controller: _controller,

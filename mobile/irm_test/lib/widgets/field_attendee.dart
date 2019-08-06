@@ -26,7 +26,7 @@ class _FieldAttendeeState extends State<FieldAttendee> {
   Widget build(BuildContext context) {
     return Row(children: <Widget>[
       Container(
-        child: Text('Attendees:'),
+        child: Text('Select attendees: '),
       ),
       DropdownButton<String>(
         items: widget.attendees.map<DropdownMenuItem<String>>((String value) {
@@ -40,7 +40,9 @@ class _FieldAttendeeState extends State<FieldAttendee> {
       ),
       RaisedButton(
         child: Text('Add attendee'),
-        onPressed: widget.onPressed,
+        onPressed: () {
+          widget.onPressed(widget.dropdownValue);
+        },
       ),
     ]);
   }
