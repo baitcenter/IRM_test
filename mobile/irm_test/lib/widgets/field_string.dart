@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FieldString extends StatefulWidget {
-  //using "key" names forlater localization
+  //using "key" names for later localization
   final String hintTextKey;
   final String labelTextKey;
   final String userData;

@@ -3,20 +3,12 @@ import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_blocs/bloc_provider.dart';
 import 'package:irm_test/widgets/field_string.dart';
 
-class UserNameSelect extends StatefulWidget {
-  @override
-  _UserNameSelectState createState() => _UserNameSelectState();
-}
+class UserNameSelect extends StatelessWidget {
+  final AppBloc appBloc;
 
-class _UserNameSelectState extends State<UserNameSelect> {
-  AppBloc _appBloc;
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    _appBloc ??= BlocProvider.of(context).appBloc;
-  }
+  const UserNameSelect({Key key, this.appBloc})
+      : assert(appBloc != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +25,7 @@ class _UserNameSelectState extends State<UserNameSelect> {
                   hintTextKey: 'Choose a user name',
                   labelTextKey: 'User name',
                   userData: '',
-                  updater: _appBloc.updateUserName,
+                  updater: appBloc.updateUserName,
                 ),
               ),
             ),
@@ -50,7 +42,7 @@ class _UserNameSelectState extends State<UserNameSelect> {
       child: Text('save user name'),
       //TO DO: prevent multiple button presses for same event
       onPressed: () {
-        _appBloc.defineStep(StartUp.calendarSelect);
+        appBloc.defineStep(StartUp.calendarSelect);
       },
     );
   }
