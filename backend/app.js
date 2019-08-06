@@ -45,7 +45,7 @@ app.post('/createuser', (req,res)=> {
         if (err) {
             res.status(418) 
             return res.send(err)};
-        console.log('saved to database');
+        console.log('saved user to database');
         return res.status(200)
 
     })
@@ -69,19 +69,20 @@ app.post('/updateuser',(req,res)=>res.send('update user details in MongoDB'));
 app.delete('/userdelete',(req,res)=>res.send('delete user in MongoDB'));
 
 app.get('/getevent',(req,res) => res.send('Get event details from mongoDB'));
-app.post('/createevent', (req,res)=> res.send('Create new event in MongoDB'));
+app.post('/createevent', (req,res)=> {
+    myDB.collection('calendar').insertOne(req.body,(err,result)=>{
+        if (err) {
+            res.status(418) 
+            return res.send(err)};
+        console.log('saved event to database');
+        return res.status(200)
+    
+    })
+});
 app.post('/updateevent',(req,res)=>res.send('update event details in MongoDB'));
-app.delete('/eventdelete',(req,res)=>res.send('delete event in MongoDB'));
+app.delete('/eventdelete',(req,res)=>{ 
+});
 
-function processResults(err,result){
-    if (err) {
-        res.status(418);
-        throw err
-    };
-    queryResult=JSON.stringify(result);
-    console.log(queryResult);
-    res.status(200);
-    return res.send(queryResult);
-}
+
 
 
