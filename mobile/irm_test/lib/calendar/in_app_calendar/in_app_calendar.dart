@@ -139,7 +139,7 @@ class _InAppCalendarState extends State<InAppCalendar>
 
   Widget _buildEventList() {
     return ListView(
-      children: _selectedEvents != null
+      children: _selectedEvents.isNotEmpty
           ? _selectedEvents
               .map((event) => _eventTile(
                     child: ListTile(
