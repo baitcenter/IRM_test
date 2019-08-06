@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "manage DB connections",
   "main": "app.js",
+  "engines": {
+    "node": "^8.0.0"
+  },
   "dependencies": {
     "body-parser": "^1.19.0",
     "dotenv": "^8.0.0",

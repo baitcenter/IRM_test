@@ -46,7 +46,9 @@ app.post('/createuser', (req,res)=> {
             res.status(418) 
             return res.send(err)};
         console.log('saved user to database');
-        return res.status(200)
+        res.status(200)
+        res.send("user created");
+        return;
 
     })
 });
@@ -75,8 +77,9 @@ app.post('/createevent', (req,res)=> {
             res.status(418) 
             return res.send(err)};
         console.log('saved event to database');
-        return res.status(200)
-    
+        res.status(200);
+        res.send("event created");
+        return;
     })
 });
 app.post('/updateevent',(req,res)=>res.send('update event details in MongoDB'));
