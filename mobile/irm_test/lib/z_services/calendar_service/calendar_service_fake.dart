@@ -1,5 +1,6 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:irm_test/services.dart';
+import 'package:irm_test/z_services/calendar_service/extended_event.dart';
 
 class CalendarServiceFake extends CalendarService {
   DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
@@ -82,7 +83,7 @@ class CalendarServiceFake extends CalendarService {
   }
 
   @override
-  createEventInDB() {
+  createEventInDB(ExtendedEvent event) {
     // TODO: implement createEventInDB
     return null;
   }
