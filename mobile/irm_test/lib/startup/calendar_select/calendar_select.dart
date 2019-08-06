@@ -3,27 +3,19 @@ import 'package:frideos/frideos.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_blocs/bloc_provider.dart';
 
-class CalendarSelect extends StatefulWidget {
-  @override
-  _CalendarSelectState createState() => _CalendarSelectState();
-}
+class CalendarSelect extends StatelessWidget {
+  final AppBloc appBloc;
 
-class _CalendarSelectState extends State<CalendarSelect> {
-  AppBloc _appBloc;
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    _appBloc ??= BlocProvider.of(context).appBloc;
-    _appBloc.retrieveCalendars();
-  }
+  const CalendarSelect({Key key, this.appBloc})
+      : assert(appBloc != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    appBloc.retrieveCalendars();
     return StreamedWidget(
         noDataChild: Container(color: Colors.amber),
-        stream: _appBloc.calendars,
+        stream: appBloc.calendars,
         builder: (context, snapshot) {
           if (snapshot.data.length != 0) {
             return ListView.builder(
@@ -37,8 +29,8 @@ class _CalendarSelectState extends State<CalendarSelect> {
                     ),
                     onPressed: () {
                       //TO DO : save name and Calendar to DB
-                      _appBloc.selectCalendar(snapshot.data[position]);
-                      _appBloc.createUserInDB();
+                      appBloc.selectCalendar(snapshot.data[position]);
+                      appBloc.createUserInDB();
                     },
                   );
                 });

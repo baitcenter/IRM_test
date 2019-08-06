@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:irm_test/calendar/create_event/create_event.dart';
+import 'package:irm_test/calendar/create_event/create_event_builder.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class InAppCalendar extends StatefulWidget {
@@ -165,7 +165,7 @@ class _InAppCalendarState extends State<InAppCalendar>
   }
 
   void _goToCreateEvent(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => CreateEvent()));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => CreateEventBuilder(context).make()));
   }
 }
