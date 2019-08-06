@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
 import 'package:irm_test/startup/agenda/agenda.dart';
-import 'package:irm_test/startup/agenda/agenda_builder.dart';
 import 'package:irm_test/startup/calendar_select/calendar_select.dart';
-import 'package:irm_test/startup/calendar_select/calendar_select_builder.dart';
 import 'package:irm_test/startup/login/login_builder.dart';
 import 'package:irm_test/startup/login/login_screen.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
@@ -23,6 +21,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     bloc ??= BlocProvider.of(context).appBloc;
+    //bloc.checkExistingUserAndCalendar();
   }
 
   @override
@@ -55,10 +54,10 @@ class _HomePageState extends State<HomePage> {
                   page = UserNameSelect();
                   break;
                 case StartUp.calendarSelect:
-                  page = CalendarSelectBuilder(context).make();
+                  page = CalendarSelect();
                   break;
                 case StartUp.agenda:
-                  page = AgendaBuilder(context).make();
+                  page = Agenda();
                   // page = CalendarSample();
                   break;
                 default:

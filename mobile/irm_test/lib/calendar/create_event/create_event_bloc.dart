@@ -2,6 +2,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
 import 'package:irm_test/services.dart';
 import 'package:irm_test/z_services/calendar_service/extended_event.dart';
+import 'package:irm_test/z_services/calendar_service/guest.dart';
 
 class CreateEventBloc {
   final UserService userService;
@@ -197,10 +198,12 @@ class CreateEventBloc {
 
   Future<bool> createEventInDb() async {
     User owner = await userService.getUser();
-    List<User> guests = _selectedAttendees.value;
+    List<User> guestsUsers = _selectedAttendees.value;
+    List<Guest> guests = List<Guest>.from(
+        guestsUsers.map((user) => Guest(user: user, isAttending: 1)));
     Event event = _eventToSend.value;
-    ExtendedEvent dbEvent =
-        ExtendedEvent(event: event, owner: owner, guests: guests);
+    ExtendedEvent dbEvent = ExtendedEvent(
+        event: event, owner: owner, guests: guests, isCancelled: false);
     try {
       bool createdInDb = await calendarService.createEventInDB(dbEvent);
       if (createdInDb) {
@@ -212,6 +215,7 @@ class CreateEventBloc {
     } catch (e) {
       print('error creating event in DB:$e');
     }
+    return false;
   }
 
   dispose() {

@@ -39,7 +39,7 @@ class CalendarServiceBackend extends CalendarService {
 
   @override
   Future<bool> createEventInDB(ExtendedEvent event) async {
-    Uri uri = Uri.https(host, '/createEvent');
+    Uri uri = Uri.http(host, '/createEvent');
 
     print('creating event in DB');
     var response = await http.post(uri,
@@ -47,7 +47,8 @@ class CalendarServiceBackend extends CalendarService {
           'Content-Type': 'application/json',
         },
         body: json.encode(event.toJson()));
-    print('event req staus code : ${response.statusCode}');
+    print('event creation code : ${response.statusCode}');
+    print('body: ${response.body}');
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       print('event DB all OK');
