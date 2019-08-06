@@ -12,5 +12,6 @@ class User {
   User({this.userName, this.calendar, this.uid});
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }

@@ -27,6 +27,14 @@ class CreateEvent extends StatefulWidget {
 class _CreateEventState extends State<CreateEvent> {
   String dropdownValue;
 
+  //TO DO: see if makes more sense to fetch users
+  //in didChangeDep
+  @override
+  void initState() {
+    super.initState();
+    widget.createEventBloc.getAllUsersFromDB();
+  }
+
   @override
   void dispose() {
     widget.createEventBloc.dispose();
@@ -74,6 +82,18 @@ class _CreateEventState extends State<CreateEvent> {
               startOrEndTime: 'end time',
               updaterTime: widget.createEventBloc.updateEventEndTime,
             ),
+            SizedBox(height: 20),
+            StreamedWidget(
+                noDataChild: Container(color: Colors.pink, height: 20),
+                stream: widget.createEventBloc.attendeeNames,
+                builder: (context, snapshot) {
+                  return FieldAttendee(
+                    onPressed: null,
+                    onChanged: dropdownOnChanged,
+                    attendees: snapshot.data,
+                    dropdownValue: dropdownValue,
+                  );
+                }),
             _confirmButton(context),
             //_backButton(context), // TO DO: check redundancy with appBar
           ],
@@ -109,12 +129,6 @@ class _CreateEventState extends State<CreateEvent> {
             userData: '',
             updater: updaterTime,
           ),
-        ),
-        FieldAttendee(
-          onPressed: null,
-          onChanged: dropdownOnChanged,
-          attendees: null,
-          dropdownValue: dropdownValue,
         ),
       ],
     );

@@ -10,9 +10,7 @@ class CreateEventBloc {
   CreateEventBloc(
     this.userService,
     this._calendarService,
-  ) {
-    getAllUsersFromDB();
-  }
+  );
 
   var _allUsers = StreamedValue<List<User>>();
   var _buttonPressed = StreamedValue<bool>()..value = false;
@@ -25,12 +23,15 @@ class CreateEventBloc {
   var _eventEndDate = StreamedValue<String>();
   var _eventEndTime = StreamedValue<String>();
   var _eventAttendees = StreamedValue<List<Attendee>>();
+  var _attendeeNames = StreamedValue<List<String>>();
 
   Stream<List<User>> get allUsers => _allUsers.outStream;
   Stream<bool> get isButtonPressed => _buttonPressed.outStream;
 
   Stream<String> get eventTitle => _eventTitle.outStream;
   Stream<String> get eventLocation => _eventLocation.outStream;
+  Stream<List<Attendee>> get attendees => _eventAttendees.outStream;
+  Stream<List<String>> get attendeeNames => _attendeeNames.outStream;
 
   void pressButtonState() {
     _buttonPressed.value = !_buttonPressed.value;
@@ -42,6 +43,18 @@ class CreateEventBloc {
       var users = await userService.getAllUsers();
       _allUsers.value = users;
       print('all users: ${_allUsers.value}');
+
+      List<Attendee> _attendees = List<Attendee>.from(users.map((user) {
+        return Attendee(user.userName);
+      }));
+      _eventAttendees.value = _attendees;
+      print('Attendee list: $_attendees');
+
+      List<String> _attendeesList =
+          List<String>.from(_attendees.map((attendee) => attendee.name));
+      _attendeeNames.value = _attendeesList;
+      print('attendees name list: $_attendeesList');
+
       return;
     } catch (e) {
       print('error fetching users: $e');
@@ -146,6 +159,7 @@ class CreateEventBloc {
   dispose() {
     _buttonPressed.dispose();
     _allUsers.dispose();
+    _attendeeNames.dispose();
     _eventTitle.dispose();
     _eventLocation.dispose();
     _eventDescription.dispose();

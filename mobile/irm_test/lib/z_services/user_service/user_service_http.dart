@@ -28,6 +28,7 @@ class UserServiceHttp extends UserService {
           List<User>.from(jsonBody.map((user) => User.fromJson(user)));
       User result = userList[0];
       print('request ok, sending user');
+      print(result.userName);
       return result;
     }
     print('request done: no user');
@@ -36,6 +37,30 @@ class UserServiceHttp extends UserService {
       calendar: null,
       uid: '',
     );
+  }
+
+  @override
+  Future<List<User>> getAllUsers() async {
+    Uri uri = Uri.https(host, '/getallusers');
+    var response =
+        await http.get(uri, headers: {'Content-Type': 'application/json'});
+
+    if (response.statusCode == 200) {
+      var jsonBody = json.decode(response.body);
+      print(jsonBody);
+      print(jsonBody.runtimeType);
+      if (jsonBody != []) {
+        var result =
+            List<User>.from(jsonBody.map((user) => User.fromJson(user)));
+        print("all users sent");
+        return result;
+      }
+      print('user list empty');
+      return null;
+    }
+    print('request done: no user');
+
+    return null;
   }
 
   Future<bool> createUser(String userName, Calendar calendar) async {
@@ -59,29 +84,5 @@ class UserServiceHttp extends UserService {
       return true;
     }
     return false;
-  }
-
-  @override
-  Future<List<User>> getAllUsers() async {
-    Uri uri = Uri.https(host, '/getallusers');
-
-    print('sending get request: get all users');
-
-    var response =
-        await http.get(uri, headers: {'Content-Type': 'application/json'});
-
-    if (response.statusCode == 200) {
-      var jsonBody = json.decode(response.body);
-      if (jsonBody != []) {
-        var result =
-            List<User>.from(jsonBody.map((user) => User.fromJson(user)));
-        return result;
-      }
-      print('user list empty');
-      return null;
-    }
-    print('request done: no user');
-
-    return null;
   }
 }
