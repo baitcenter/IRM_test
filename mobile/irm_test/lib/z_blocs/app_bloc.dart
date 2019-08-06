@@ -8,8 +8,6 @@ class AppBloc {
   final UserService userService;
 
   AppBloc(this.authService, this.userService) {
-    //Check if user is logged in FB, then check if user and calendar have been set
-    //If so go straight to homepage/calendar
     authService.getCurrentUser().then((userFB) {
       if (userFB.uid != null) {
         userService.getUser().then((user) {
@@ -19,16 +17,22 @@ class AppBloc {
           } else {
             updateUserName(user.userName);
           }
-          if (user.userName != '' && user.calendar != null) {
-            selectCalendar(user.calendar);
+          if (user.calendar != null) {
+            print(user.calendar.id);
+            print(user.calendar.name);
+            print(user.calendar.isReadOnly);
+            requestAccessToCalendar().then((_) {
+              selectCalendar(user.calendar);
+            });
           }
         });
       }
     });
-    //TO DO: refactor to delete this (legacy) listener
+
     calendarStream = selectedCalendar.listen((calendar) {
       if (calendar != null) {
         defineStep(StartUp.agenda);
+        print(calendar.id);
       }
     });
   }
@@ -46,6 +50,7 @@ class AppBloc {
   var _userName = StreamedValue<String>();
   var _calendars = StreamedValue<List<Calendar>>();
   var _selectedCalendar = StreamedValue<Calendar>();
+  var _deviceAccessGranted = StreamedValue<bool>()..inStream(false);
 
   Stream<StartUp> get currentStep => _currentStep.outStream;
   //phone auth
@@ -59,6 +64,21 @@ class AppBloc {
   void defineStep(StartUp step) {
     _currentStep.value = step;
     return;
+  }
+
+  Future<bool> requestAccessToCalendar() async {
+    var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
+    if (permissionsGranted.isSuccess && !permissionsGranted.data) {
+      permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
+      if (!permissionsGranted.isSuccess || !permissionsGranted.data) {
+        defineStep(StartUp.login);
+        _deviceAccessGranted.value = false;
+        return false;
+      }
+    }
+    print('access granted');
+    _deviceAccessGranted.value = true;
+    return true;
   }
 
   //Authentication
@@ -93,10 +113,17 @@ class AppBloc {
     try {
       await authService.confirmSMSCode(
           verificationId: _verificationId.value, smsCode: _sms.value);
-      defineStep(StartUp.agenda);
     } catch (err) {
       print('error with confirmation code: ' + err);
     }
+    var hasPermission = await requestAccessToCalendar();
+    if (!hasPermission) return;
+    var currentUser = await userService.getUser();
+    if (currentUser == null) {
+      defineStep(StartUp.userNameSelect);
+      return;
+    }
+    defineStep(StartUp.calendarSelect);
     return;
   }
 
@@ -107,9 +134,38 @@ class AppBloc {
     return;
   }
 
+  //Go straight to main page if user logged in + exists in DB
+
+  void checkExistingUserAndCalendar() {
+    print('cursed function starting');
+    authService.getCurrentUser().then((userFB) {
+      if (userFB.uid != null) {
+        userService.getUser().then((user) {
+          print('user received');
+          if (user.userName == '') {
+            defineStep(StartUp.userNameSelect);
+            return;
+          } else {
+            updateUserName(user.userName);
+          }
+          if (user.calendar != null) {
+            print(user.calendar.id);
+            print(user.calendar.name);
+            print(user.calendar.isReadOnly);
+            requestAccessToCalendar().then((_) {
+              selectCalendar(user.calendar);
+              return;
+            });
+          }
+        });
+      }
+    });
+  }
+
   //Set user name and create in DB
   void updateUserName(String userName) {
     _userName.value = userName;
+    print('username set: ${_userName.value}');
     return;
   }
 
@@ -126,11 +182,14 @@ class AppBloc {
 
   //Retrieve and select Calendars
   void selectCalendar(Calendar calendar) {
+    print('selecting calendar');
     _selectedCalendar.value = calendar;
+    print('calendar selected: ${_selectedCalendar.value.id}');
+    //defineStep(StartUp.agenda);
     return;
   }
 
-  void retrieveCalendars() async {
+  Future<bool> retrieveCalendars() async {
     //Retrieve user's calendars from mobile device
     //Request permissions first if they haven't been granted
     try {
@@ -138,7 +197,7 @@ class AppBloc {
       if (permissionsGranted.isSuccess && !permissionsGranted.data) {
         permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
         if (!permissionsGranted.isSuccess || !permissionsGranted.data) {
-          return;
+          defineStep(StartUp.login);
         }
       }
       Result<List<Calendar>> calendarsResult =
@@ -147,7 +206,7 @@ class AppBloc {
     } catch (e) {
       print(e);
     }
-    return;
+    return true;
   }
 
   dispose() {

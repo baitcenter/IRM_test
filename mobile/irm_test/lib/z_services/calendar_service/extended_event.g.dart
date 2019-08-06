@@ -21,10 +21,11 @@ ExtendedEvent _$ExtendedEventFromJson(Map json) {
     guests: (json['guests'] as List)
         ?.map((e) => e == null
             ? null
-            : User.fromJson((e as Map)?.map(
+            : Guest.fromJson((e as Map)?.map(
                 (k, e) => MapEntry(k as String, e),
               )))
         ?.toList(),
+    isCancelled: json['isCancelled'] as bool,
   );
 }
 
@@ -33,4 +34,5 @@ Map<String, dynamic> _$ExtendedEventToJson(ExtendedEvent instance) =>
       'event': instance.event,
       'owner': instance.owner,
       'guests': instance.guests,
+      'isCancelled': instance.isCancelled,
     };

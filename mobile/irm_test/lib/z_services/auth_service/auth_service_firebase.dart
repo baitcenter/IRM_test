@@ -52,7 +52,7 @@ class AuthServiceFirebase extends AuthService {
   @override
   Future<UserAuthData> getCurrentUser() async {
     var firebaseUser = await FirebaseAuth.instance.currentUser();
-    if (firebaseUser == null) return null;
+    if (firebaseUser == null) return UserAuthData(uid: null, phoneNr: '');
     return UserAuthData(
         uid: firebaseUser.uid, phoneNr: firebaseUser.phoneNumber ?? '');
   }
