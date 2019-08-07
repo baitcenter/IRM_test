@@ -11,15 +11,6 @@ import 'package:irm_test/z_blocs/bloc_provider.dart';
 import 'package:irm_test/z_services/service_provider.dart';
 
 class CreateEvent extends StatefulWidget {
-/*  final AppBloc appBloc;
-  final CreateEventBloc createEventBloc;
-
-  const CreateEvent(
-      {Key key, @required this.appBloc, @required this.createEventBloc})
-      : assert(appBloc != null),
-        assert(createEventBloc != null),
-        super(key: key);*/
-
   @override
   _CreateEventState createState() => _CreateEventState();
 }

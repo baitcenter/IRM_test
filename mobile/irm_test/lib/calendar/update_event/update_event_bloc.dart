@@ -1,0 +1,3 @@
+class UpdateEventBloc {
+  dispose() {}
+}

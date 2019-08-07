@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +19,8 @@ class AgendaBloc {
     //fetch events from phone and DB and pass data into streams
     checkToday = today.listen((today) {
       selectedCalendar = _appBloc.selectedCalendar.listen((calendar) {
-        fetchAndPrepareEventsForDisplay(today, calendar.id);
+        _selectedCalendar.value = calendar;
+        prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
       });
     });
   }
@@ -33,6 +33,7 @@ class AgendaBloc {
   var _eventsFromDB = StreamedValue<List<ExtendedEvent>>();
   var _eventsFromPhone = StreamedValue<List<Event>>();
   var _user = StreamedValue<User>();
+  var _selectedCalendar = StreamedValue<Calendar>();
 
   Stream<Map<DateTime, List>> get events => _eventsToDisplay.outStream;
   Stream<DateTime> get today => _today.outStream;
@@ -50,7 +51,6 @@ class AgendaBloc {
         eventMap[today].add(event);
       }
     }
-
     return eventMap;
   }
 
@@ -65,7 +65,17 @@ class AgendaBloc {
     return eventsFromDB;
   }
 
-  void fetchAndPrepareEventsForDisplay(
+  void prepareEventsForDisplayAndUpdatePhone(
+      DateTime today, String calendarId) async {
+    fetchEventsFromPhoneAndDb(today, calendarId).then((_) {
+      var eventsMap = syncEventsFromPhoneAndDb(
+          _eventsFromDB.value, _eventsFromPhone.value, _user.value);
+      _eventsToDisplay.value = eventsMap;
+      updatePhoneCalendar(_eventsFromDB.value, _eventsFromPhone.value);
+    });
+  }
+
+  Future<bool> fetchEventsFromPhoneAndDb(
       DateTime today, String calendarId) async {
     try {
       var eventsFromPhone =
@@ -75,46 +85,76 @@ class AgendaBloc {
       var eventsFromDB = await getEventsFromDB(_user.value);
       _eventsFromDB.value = eventsFromDB;
       print('db events: ${_eventsFromDB.value}');
-
-      var eventsMap = syncEventsFromPhoneAndDb(
-          _eventsFromDB.value, _eventsFromPhone.value, _user.value);
-      _eventsToDisplay.value = eventsMap;
     } catch (e) {
-      print('error managing event :$e');
+      print('error fetching events :$e');
     }
+    return true;
   }
 
-  //avoid null
   Map<DateTime, List> syncEventsFromPhoneAndDb(
       List<ExtendedEvent> fromDb, List<Event> phone, User user) {
     List<Event> eventsList = [];
+    eventsList = filterDbEvents(eventsList, fromDb, user);
     Map<DateTime, List> eventsMap = {};
-    print('sync user:${user.userName}');
 
-    if (fromDb.isNotEmpty) {
-      eventsList = filterDbEvents(eventsList, fromDb, user);
-      print('first step eventList: $eventsList');
-    }
-
-    if (fromDb.isNotEmpty && phone.isNotEmpty) {
-      for (var extendedEvent in fromDb) {
-        for (var event in phone) {
-          if (event.eventId != extendedEvent.event.eventId) {
-            eventsList.add(event);
+    //Below code was to show events from phone outside of agenda. Code needs to be restructured to avoid error
+/*    if (eventsList.isNotEmpty && phone.isNotEmpty) {
+      for (var e in eventsList) {
+        for (var p in phone) {
+          if (e.title != p.title) {
+            eventsList.add(p);
           }
         }
-        print('second step eventLits: $eventsList');
       }
-    }
-
+    }*/
     if (fromDb.isEmpty && phone.isNotEmpty) {
       eventsMap = convertListToMap(phone);
       return eventsMap;
     }
 
-    print('list before mapping: $eventsList');
     eventsMap = convertListToMap(eventsList);
     return eventsMap;
+  }
+
+  void updatePhoneCalendar(
+      List<ExtendedEvent> fromDB, List<Event> fromPhone) async {
+    for (var dbEvent in fromDB) {
+      if (dbEvent.owner.uid == _user.value.uid) {
+        var updated = await _calendarService.createEvent(dbEvent.event);
+        print('event${dbEvent.event} updated: $updated');
+      }
+
+      Event invitation;
+      for (var guest in dbEvent.guests) {
+        if (guest.name == _user.value.userName) {
+          invitation = dbEvent.event;
+        }
+      }
+      //if guest event exists on phone, delete and replace with version from DB
+      //else just create it
+      if (invitation != null) {
+        for (var phoneEvent in fromPhone) {
+          //Add more conditions to avoid wrong results.
+          if (phoneEvent.title == invitation.title &&
+              phoneEvent.start == invitation.start) {
+            var createInvitation =
+                await _calendarService.createEvent(invitation);
+            print(
+                'existing event recreated on phone:${invitation.title} : $createInvitation');
+            if (createInvitation) {
+              var deleted = await _calendarService.deleteEventFromPhone(
+                  _selectedCalendar.value.id, phoneEvent.eventId);
+              print('event deleted: ${phoneEvent.title}: $deleted');
+            }
+          } else {
+            var createInvitation =
+                await _calendarService.createEvent(invitation);
+            print(
+                ' new event created on phone:${invitation.title} : $createInvitation');
+          }
+        }
+      }
+    }
   }
 
   bool compareDates(DateTime today, DateTime event) {
@@ -128,13 +168,11 @@ class AgendaBloc {
 
   List<Event> filterDbEvents(
       List<Event> eventsList, List<ExtendedEvent> fromDb, User user) {
-    print('filterdbevents user:${user.userName}');
     for (var extendedEvent in fromDb) {
-      print('start filtering');
-      if (extendedEvent.owner == user && !extendedEvent.isCancelled) {
+      if (extendedEvent.owner.userName == user.userName &&
+          !extendedEvent.isCancelled) {
         eventsList.add(extendedEvent.event);
       }
-      print('making list');
       List<Guest> isGuest = extendedEvent.guests
           .where((guest) => guest.name == user.userName)
           .toList();
@@ -143,11 +181,13 @@ class AgendaBloc {
       if (isGuest.isNotEmpty &&
           !extendedEvent.isCancelled &&
           isGuest[0].isAttending != 2) {
-        print('found one!');
         eventsList.add(extendedEvent.event);
       }
     }
-    print('filter eventlist: $eventsList');
+    //replace calendarId by user's to allow writing on phone
+    for (var e in eventsList) {
+      e.calendarId = _selectedCalendar.value.id;
+    }
     return eventsList;
   }
 
@@ -155,6 +195,7 @@ class AgendaBloc {
     _eventsToDisplay.dispose();
     _eventsFromDB.dispose();
     _eventsFromPhone.dispose();
+    _selectedCalendar.dispose();
     _today.dispose();
     _user.dispose();
     checkToday.cancel();
