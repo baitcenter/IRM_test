@@ -198,13 +198,9 @@ class CreateEventBloc {
 
   Future<bool> createEventInDb() async {
     User owner = await userService.getUser();
-    Map<String, Guest> guests = {};
     List<User> guestsUsers = _selectedAttendees.value;
-    List<Guest> guestsList = List<Guest>.from(
-        guestsUsers.map((user) => Guest(user: user, isAttending: 1)));
-    for (var item in guestsList) {
-      guests[item.user.userName] = item;
-    }
+    List<Guest> guests = List<Guest>.from(guestsUsers
+        .map((user) => Guest(name: user.userName, user: user, isAttending: 1)));
     Event event = _eventToSend.value;
     ExtendedEvent dbEvent = ExtendedEvent(
         event: event, owner: owner, guests: guests, isCancelled: false);

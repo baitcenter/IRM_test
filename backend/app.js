@@ -1,7 +1,7 @@
-const express= require('express');
-const bodyParser= require('body-parser')
-const app=express();
-const dotenv=require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser')
+const app = express();
+const dotenv = require('dotenv').config();
 
 //please secure this
 let url = "mongodb://master:ceM7kFQCWkdLZcUEXkDaKhkg@ds016108.mlab.com:16108/test-irm";
@@ -9,42 +9,43 @@ const port = process.env.PORT || 5000;
 
 var myDB;//global var for the DB, not so clean
 
-let mongodb = require ('mongodb').MongoClient;
-app.use(bodyParser.urlencoded({extended:true}));
+let mongodb = require('mongodb').MongoClient;
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-mongodb.connect(url, { useNewUrlParser: true },function(err,db,){
+mongodb.connect(url, { useNewUrlParser: true }, function (err, db, ) {
     if (err) throw err;
-    myDB=db.db("test-irm");
-    app.listen(port, function(){
-        console.log ('listening to '+ port)
+    myDB = db.db("test-irm");
+    app.listen(port, function () {
+        console.log('listening to ' + port)
     });
 })
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
-app.get('/getuser',(req,res) => {
+app.get('/getuser', (req, res) => {
     let uid = req.query.uid;
-    let queryResult=[];
+    let queryResult = [];
     myDB.collection('team')
-    .find({"uid":uid})
-    .toArray(function(err,result){
-        if (err) {
-            res.status(418);
-            throw err
-        };
-        queryResult=JSON.stringify(result);
-        console.log(queryResult);
-        res.status(200);
-        return res.send(queryResult);
-    })
+        .find({ "uid": uid })
+        .toArray(function (err, result) {
+            if (err) {
+                res.status(418);
+                throw err
+            };
+            queryResult = JSON.stringify(result);
+            console.log(queryResult);
+            res.status(200);
+            return res.send(queryResult);
+        })
 });
-app.post('/createuser', (req,res)=> {
+app.post('/createuser', (req, res) => {
     //needs sanitization 
-    myDB.collection('team').insertOne(req.body,(err,result)=>{
+    myDB.collection('team').insertOne(req.body, (err, result) => {
         if (err) {
-            res.status(418) 
-            return res.send(err)};
+            res.status(418)
+            return res.send(err)
+        };
         console.log('saved user to database');
         res.status(200)
         res.send("user created");
@@ -53,54 +54,57 @@ app.post('/createuser', (req,res)=> {
     })
 });
 
-app.get('/getallusers',(req,res)=>{
-    let queryResult=[];
-    myDB.collection('team').find( {} ).toArray(function(err,result){
+app.get('/getallusers', (req, res) => {
+    let queryResult = [];
+    myDB.collection('team').find({}).toArray(function (err, result) {
         if (err) {
             res.status(418);
             throw err
         };
-        queryResult=JSON.stringify(result);
+        queryResult = JSON.stringify(result);
         console.log(queryResult);
         res.status(200);
         return res.send(queryResult);
     });
 });
 
-app.post('/updateuser',(req,res)=>res.send('update user details in MongoDB'));
-app.delete('/userdelete',(req,res)=>res.send('delete user in MongoDB'));
+app.post('/updateuser', (req, res) => res.send('update user details in MongoDB'));
+app.delete('/userdelete', (req, res) => res.send('delete user in MongoDB'));
 //using post as long as no middleware
-app.post('/getevents',(req,res) => {
-    let reqBody= req.body;
+app.post('/getevents', (req, res) => {
+
+    let reqBody = req.body;
     console.log(req.body);
     console.log(typeof req.body);
-    let userName= req.body.userName;
-    console.log('username',userName);
-    let queryResult=[];
-    myDB.collection('calendar').find( {"$or":[{"owner":req.body},{"guests.userName":{"$exists":true}}]} ).toArray(function(err,result){
-        if (err) {
-            res.status(418);
-            throw err
-        };
-        queryResult=JSON.stringify(result);
-        console.log(queryResult);
-        res.status(200);
-        return res.send(queryResult);
-    });
+    let userName = req.body.userName;
+    console.log('username', userName);
+    let queryResult = [];
+    myDB.collection('calendar').find({ "$or": [{ "owner": req.body }, { "guests.name":userName}] })
+        .toArray(function (err, result) {
+            if (err) {
+                res.status(418);
+                throw err
+            };
+            queryResult = JSON.stringify(result);
+            console.log('db event query: ',queryResult);
+            res.status(200);
+            return res.send(queryResult);
+        });
 });
-app.post('/createevent', (req,res)=> {
-    myDB.collection('calendar').insertOne(req.body,(err,result)=>{
+app.post('/createevent', (req, res) => {
+    myDB.collection('calendar').insertOne(req.body, (err, result) => {
         if (err) {
-            res.status(418) 
-            return res.send(err)};
+            res.status(418)
+            return res.send(err)
+        };
         console.log('saved event to database');
         res.status(200);
         res.send("event created");
         return;
     })
 });
-app.post('/updateevent',(req,res)=>res.send('update event details in MongoDB'));
-app.delete('/eventdelete',(req,res)=>{ 
+app.post('/updateevent', (req, res) => res.send('update event details in MongoDB'));
+app.delete('/eventdelete', (req, res) => {
 });
 
 

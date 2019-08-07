@@ -5,10 +5,11 @@ part 'guest.g.dart';
 
 @JsonSerializable()
 class Guest {
+  final String name;
   final User user;
   final int isAttending;
 
-  Guest({this.user, this.isAttending});
+  Guest({this.name, this.user, this.isAttending});
 
   factory Guest.fromJson(Map<String, dynamic> json) => _$GuestFromJson(json);
 

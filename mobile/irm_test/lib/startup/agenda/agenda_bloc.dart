@@ -6,13 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:irm_test/services.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_services/calendar_service/extended_event.dart';
+import 'package:irm_test/z_services/calendar_service/guest.dart';
 
 class AgendaBloc {
   final CalendarService _calendarService;
   final AppBloc _appBloc;
 
   AgendaBloc(this._calendarService, this._appBloc) {
-    user = _appBloc.user.listen((user) {
+    userListener = _appBloc.user.listen((user) {
       _user.value = user;
     });
 
@@ -25,7 +26,7 @@ class AgendaBloc {
   }
   StreamSubscription selectedCalendar;
   StreamSubscription checkToday;
-  StreamSubscription user;
+  StreamSubscription userListener;
 
   var _eventsToDisplay = StreamedValue<Map<DateTime, List>>();
   var _today = StreamedValue<DateTime>();
@@ -57,6 +58,7 @@ class AgendaBloc {
     List<ExtendedEvent> eventsFromDB;
     try {
       eventsFromDB = await _calendarService.getEventsFromDB(user);
+      print('eventsFromDB API call: $eventsFromDB');
     } catch (e) {
       print('problem with events API call: $e');
     }
@@ -97,7 +99,7 @@ class AgendaBloc {
     if (fromDb.isNotEmpty && phone.isNotEmpty) {
       for (var extendedEvent in fromDb) {
         for (var event in phone) {
-          if (event != extendedEvent.event) {
+          if (event.eventId != extendedEvent.event.eventId) {
             eventsList.add(event);
           }
         }
@@ -128,14 +130,19 @@ class AgendaBloc {
       List<Event> eventsList, List<ExtendedEvent> fromDb, User user) {
     print('filterdbevents user:${user.userName}');
     for (var extendedEvent in fromDb) {
+      print('start filtering');
       if (extendedEvent.owner == user && !extendedEvent.isCancelled) {
         eventsList.add(extendedEvent.event);
       }
+      print('making list');
+      List<Guest> isGuest = extendedEvent.guests
+          .where((guest) => guest.name == user.userName)
+          .toList();
+      print(isGuest.isNotEmpty);
 
-      ///Add condition to avoid null
-      if (extendedEvent.guests[user.userName].user.uid == user.uid &&
+      if (isGuest.isNotEmpty &&
           !extendedEvent.isCancelled &&
-          extendedEvent.guests[user.userName].isAttending != 2) {
+          isGuest[0].isAttending != 2) {
         print('found one!');
         eventsList.add(extendedEvent.event);
       }
@@ -152,6 +159,6 @@ class AgendaBloc {
     _user.dispose();
     checkToday.cancel();
     selectedCalendar.cancel();
-    user.cancel();
+    userListener.cancel();
   }
 }
