@@ -10,22 +10,7 @@ class AppBloc {
   AppBloc(this.authService, this.userService) {
     authService.getCurrentUser().then((userFB) {
       if (userFB.uid != null) {
-        userService.getUser().then((user) {
-          print('user received');
-          if (user.userName == '') {
-            defineStep(StartUp.userNameSelect);
-          } else {
-            updateUserName(user.userName);
-          }
-          if (user.calendar != null) {
-            print(user.calendar.id);
-            print(user.calendar.name);
-            print(user.calendar.isReadOnly);
-            requestAccessToCalendar().then((_) {
-              selectCalendar(user.calendar);
-            });
-          }
-        });
+        checkExistingUserAndCalendar();
       }
     });
 
@@ -84,12 +69,10 @@ class AppBloc {
   //Authentication
   void inputSMS(String userInput) {
     _sms.inStream(userInput);
-    print('sms input');
   }
 
   void inputPhoneNr(String userInput) {
     _phoneNr.inStream(userInput);
-    print('phone input');
     return;
   }
 
@@ -98,12 +81,9 @@ class AppBloc {
     try {
       var verificationId =
           await authService.submitPhoneNumber(phoneNumber: _phoneNr.value);
-      print('verification id received');
       _verificationId.inStream(verificationId);
-      print('stream added');
       defineStep(StartUp.confirm);
     } catch (err) {
-      print('shit hit the fan');
       defineStep(StartUp.login);
       return;
     }
@@ -123,6 +103,10 @@ class AppBloc {
       defineStep(StartUp.userNameSelect);
       return;
     }
+    if (currentUser.calendar != null) {
+      defineStep(StartUp.agenda);
+      return;
+    }
     defineStep(StartUp.calendarSelect);
     return;
   }
@@ -136,30 +120,42 @@ class AppBloc {
 
   //Go straight to main page if user logged in + exists in DB
 
-  void checkExistingUserAndCalendar() {
+  void checkExistingUserAndCalendar() async {
+    //initializing userFromDb with values from empty User returned by service to avoid nested if statements
+    User userFromDB = User(userName: '', calendar: null, uid: '');
     print('cursed function starting');
-    authService.getCurrentUser().then((userFB) {
-      if (userFB.uid != null) {
-        userService.getUser().then((user) {
-          print('user received');
-          if (user.userName == '') {
-            defineStep(StartUp.userNameSelect);
-            return;
-          } else {
-            updateUserName(user.userName);
-          }
-          if (user.calendar != null) {
-            print(user.calendar.id);
-            print(user.calendar.name);
-            print(user.calendar.isReadOnly);
-            requestAccessToCalendar().then((_) {
-              selectCalendar(user.calendar);
-              return;
-            });
-          }
-        });
-      }
-    });
+    var userFB = await authService.getCurrentUser();
+    if (userFB.uid != null) {
+      userFromDB = await userService.getUser();
+      print('user received from DB');
+    }
+    if (userFromDB.userName == '') {
+      defineStep(StartUp.userNameSelect);
+      return;
+    }
+    updateUserName(userFromDB.userName);
+    if (userFromDB.calendar == null) {
+      defineStep(StartUp.calendarSelect);
+      return;
+    }
+    var deviceCalendars = await retrieveCalendars();
+    var userCalendar =
+        syncCalendarIdWithDevice(deviceCalendars, userFromDB.calendar);
+    if (userCalendar != null) {
+      _selectedCalendar.value = userCalendar;
+      return;
+    }
+    defineStep(StartUp.calendarSelect);
+    return;
+  }
+
+  //Necessary for iOS Simulator
+  Calendar syncCalendarIdWithDevice(
+      List<Calendar> deviceCalendars, Calendar calendarFromDb) {
+    for (var calendar in deviceCalendars) {
+      if (calendar.name == calendarFromDb.name) return calendar;
+    }
+    return null;
   }
 
   //Set user name and create in DB
@@ -189,24 +185,24 @@ class AppBloc {
     return;
   }
 
-  Future<bool> retrieveCalendars() async {
+  //gave a return type to be able to use .then()
+  Future<List<Calendar>> retrieveCalendars() async {
     //Retrieve user's calendars from mobile device
     //Request permissions first if they haven't been granted
     try {
-      var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
-      if (permissionsGranted.isSuccess && !permissionsGranted.data) {
-        permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
-        if (!permissionsGranted.isSuccess || !permissionsGranted.data) {
-          defineStep(StartUp.login);
-        }
+      var hasPermission = await requestAccessToCalendar();
+      if (!hasPermission) {
+        defineStep(StartUp.login);
+        return null;
       }
       Result<List<Calendar>> calendarsResult =
           await _deviceCalendarPlugin.retrieveCalendars();
       _calendars.value = calendarsResult.data;
     } catch (e) {
       print(e);
+      return null;
     }
-    return true;
+    return _calendars.value;
   }
 
   dispose() {
@@ -221,4 +217,11 @@ class AppBloc {
   }
 }
 
-enum StartUp { login, confirm, calendarSelect, userNameSelect, agenda }
+enum StartUp {
+  login,
+  confirm,
+  transition,
+  calendarSelect,
+  userNameSelect,
+  agenda
+}

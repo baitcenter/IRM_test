@@ -28,11 +28,11 @@ class CalendarServiceBackend extends CalendarService {
   Future<List<Event>> getEvents(DateTime today, String calendarId) async {
     print('launching get Events');
     //TO DO pass retrieveEventParams as parameter
-    // TODO: implement getEvents
     RetrieveEventsParams retrieveEventsParams = RetrieveEventsParams(
         //TO DO input correct parameters
         startDate: DateTime.now(),
         endDate: DateTime.now().add(Duration(days: 7)));
+    print('still in get events');
     Result result = await deviceCalendarPlugin.retrieveEvents(
         calendarId, retrieveEventsParams);
     return result.data;
