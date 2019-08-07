@@ -217,11 +217,4 @@ class AppBloc {
   }
 }
 
-enum StartUp {
-  login,
-  confirm,
-  transition,
-  calendarSelect,
-  userNameSelect,
-  agenda
-}
+enum StartUp { login, confirm, calendarSelect, userNameSelect, agenda }
