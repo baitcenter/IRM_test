@@ -4,7 +4,6 @@ import 'package:irm_test/startup/agenda/agenda.dart';
 import 'package:irm_test/startup/calendar_select/calendar_select.dart';
 import 'package:irm_test/startup/login/login_builder.dart';
 import 'package:irm_test/startup/login/login_screen.dart';
-import 'package:irm_test/startup/transition_page.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_blocs/bloc_provider.dart';
 import 'package:irm_test/startup/username_select/username_select.dart';
@@ -55,9 +54,6 @@ class _HomePageState extends State<HomePage> {
                   page =
                       LoginPageBuilder(step: LoginSteps.sms, context: context)
                           .make();
-                  break;
-                case StartUp.transition:
-                  page = TransitionPage();
                   break;
                 case StartUp.userNameSelect:
                   page = UserNameSelect();
