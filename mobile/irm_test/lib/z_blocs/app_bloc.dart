@@ -36,6 +36,7 @@ class AppBloc {
   var _calendars = StreamedValue<List<Calendar>>();
   var _selectedCalendar = StreamedValue<Calendar>();
   var _deviceAccessGranted = StreamedValue<bool>()..inStream(false);
+  var _user = StreamedValue<User>();
 
   Stream<StartUp> get currentStep => _currentStep.outStream;
   //phone auth
@@ -45,6 +46,7 @@ class AppBloc {
   Stream<String> get userName => _userName.outStream;
   Stream<List<Calendar>> get calendars => _calendars.outStream;
   Stream<Calendar> get selectedCalendar => _selectedCalendar.outStream;
+  Stream<User> get user => _user.outStream;
 
   void defineStep(StartUp step) {
     _currentStep.value = step;
@@ -127,6 +129,7 @@ class AppBloc {
     var userFB = await authService.getCurrentUser();
     if (userFB.uid != null) {
       userFromDB = await userService.getUser();
+      _user.value = userFromDB;
       print('user received from DB');
     }
     if (userFromDB.userName == '') {

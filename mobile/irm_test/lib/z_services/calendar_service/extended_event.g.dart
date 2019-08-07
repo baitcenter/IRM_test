@@ -18,13 +18,15 @@ ExtendedEvent _$ExtendedEventFromJson(Map json) {
         : User.fromJson((json['owner'] as Map)?.map(
             (k, e) => MapEntry(k as String, e),
           )),
-    guests: (json['guests'] as List)
-        ?.map((e) => e == null
-            ? null
-            : Guest.fromJson((e as Map)?.map(
-                (k, e) => MapEntry(k as String, e),
-              )))
-        ?.toList(),
+    guests: (json['guests'] as Map)?.map(
+      (k, e) => MapEntry(
+          k as String,
+          e == null
+              ? null
+              : Guest.fromJson((e as Map)?.map(
+                  (k, e) => MapEntry(k as String, e),
+                ))),
+    ),
     isCancelled: json['isCancelled'] as bool,
   );
 }

@@ -23,7 +23,13 @@ class _InAppCalendarState extends State<InAppCalendar>
   @override
   void initState() {
     super.initState();
-    _selectedEvents = widget.events[widget.today];
+    print(widget.events);
+    if (widget.events[widget.today] == null || widget.events == {}) {
+      _selectedEvents = [];
+    } else {
+      _selectedEvents = widget.events[widget.today];
+    }
+
     print('_selectedEvents:$_selectedEvents');
 
     _calendarController = CalendarController();
