@@ -36,6 +36,7 @@ class _AgendaState extends State<Agenda> {
       _appBloc,
     );
     _agendaBloc.setToday(today);
+    print('today set');
     _eventsListener ??= _agendaBloc.events.listen((events) {
       print('events:$events');
     });
