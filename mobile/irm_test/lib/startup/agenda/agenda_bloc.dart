@@ -74,8 +74,8 @@ class AgendaBloc {
       _eventsFromDB.value = eventsFromDB;
       print('db events: ${_eventsFromDB.value}');
 
-      var eventsMap =
-          syncEventsFromPhoneAndDb(_eventsFromDB.value, _eventsFromPhone.value);
+      var eventsMap = syncEventsFromPhoneAndDb(
+          _eventsFromDB.value, _eventsFromPhone.value, _user.value);
       _eventsToDisplay.value = eventsMap;
     } catch (e) {
       print('error managing event :$e');
@@ -84,10 +84,10 @@ class AgendaBloc {
 
   //avoid null
   Map<DateTime, List> syncEventsFromPhoneAndDb(
-      List<ExtendedEvent> fromDb, List<Event> phone) {
-    User user = _user.value;
+      List<ExtendedEvent> fromDb, List<Event> phone, User user) {
     List<Event> eventsList = [];
     Map<DateTime, List> eventsMap = {};
+    print('sync user:${user.userName}');
 
     if (fromDb.isNotEmpty) {
       eventsList = filterDbEvents(eventsList, fromDb, user);
@@ -126,10 +126,13 @@ class AgendaBloc {
 
   List<Event> filterDbEvents(
       List<Event> eventsList, List<ExtendedEvent> fromDb, User user) {
+    print('filterdbevents user:${user.userName}');
     for (var extendedEvent in fromDb) {
       if (extendedEvent.owner == user && !extendedEvent.isCancelled) {
         eventsList.add(extendedEvent.event);
       }
+
+      ///Add condition to avoid null
       if (extendedEvent.guests[user.userName].user.uid == user.uid &&
           !extendedEvent.isCancelled &&
           extendedEvent.guests[user.userName].isAttending != 2) {

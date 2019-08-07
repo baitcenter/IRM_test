@@ -69,8 +69,25 @@ app.get('/getallusers',(req,res)=>{
 
 app.post('/updateuser',(req,res)=>res.send('update user details in MongoDB'));
 app.delete('/userdelete',(req,res)=>res.send('delete user in MongoDB'));
-
-app.get('/getevent',(req,res) => res.send('Get event details from mongoDB'));
+//using post as long as no middleware
+app.post('/getevents',(req,res) => {
+    let reqBody= req.body;
+    console.log(req.body);
+    console.log(typeof req.body);
+    let userName= req.body.userName;
+    console.log('username',userName);
+    let queryResult=[];
+    myDB.collection('calendar').find( {"$or":[{"owner":req.body},{"guests.userName":{"$exists":true}}]} ).toArray(function(err,result){
+        if (err) {
+            res.status(418);
+            throw err
+        };
+        queryResult=JSON.stringify(result);
+        console.log(queryResult);
+        res.status(200);
+        return res.send(queryResult);
+    });
+});
 app.post('/createevent', (req,res)=> {
     myDB.collection('calendar').insertOne(req.body,(err,result)=>{
         if (err) {
