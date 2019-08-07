@@ -8,6 +8,7 @@ part of 'guest.dart';
 
 Guest _$GuestFromJson(Map json) {
   return Guest(
+    name: json['name'] as String,
     user: json['user'] == null
         ? null
         : User.fromJson((json['user'] as Map)?.map(
@@ -18,6 +19,7 @@ Guest _$GuestFromJson(Map json) {
 }
 
 Map<String, dynamic> _$GuestToJson(Guest instance) => <String, dynamic>{
+      'name': instance.name,
       'user': instance.user,
       'isAttending': instance.isAttending,
     };

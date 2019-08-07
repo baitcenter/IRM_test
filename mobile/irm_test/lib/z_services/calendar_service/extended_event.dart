@@ -10,7 +10,7 @@ part 'extended_event.g.dart';
 class ExtendedEvent {
   final Event event;
   final User owner;
-  final Map<String, Guest> guests;
+  final List<Guest> guests;
   final bool isCancelled;
 
   ExtendedEvent(

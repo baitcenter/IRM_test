@@ -7,8 +7,8 @@ import 'package:irm_test/services.dart';
 void main() {
   var authService = AuthServiceFirebase();
   //var calendarService = CalendarServiceFake();
-  var calendarService = CalendarServiceBackend('88dc11b9.ngrok.io');
-  var userService = UserServiceHttp('88dc11b9.ngrok.io', authService);
+  var calendarService = CalendarServiceBackend('95962bd5.ngrok.io');
+  var userService = UserServiceHttp('95962bd5.ngrok.io', authService);
   var appBloc = AppBloc(authService, userService);
 
   runApp(ServiceProvider(
