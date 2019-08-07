@@ -94,4 +94,16 @@ class CalendarServiceFake extends CalendarService {
     // TODO: implement getEventsFromDB
     return null;
   }
+
+  @override
+  Future<bool> updateEventInPhone(Event event) {
+    // TODO: implement updateEventInPhone
+    return null;
+  }
+
+  @override
+  Future<bool> deleteEventFromPhone(String calendarId, String eventId) {
+    // TODO: implement deleteEventFromPhone
+    return null;
+  }
 }

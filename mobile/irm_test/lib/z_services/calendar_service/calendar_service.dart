@@ -7,4 +7,6 @@ abstract class CalendarService {
   Future<bool> createEvent(Event event);
   createEventInDB(ExtendedEvent event);
   Future<List<ExtendedEvent>> getEventsFromDB(User user);
+  Future<bool> updateEventInPhone(Event event);
+  Future<bool> deleteEventFromPhone(String calendarId, String eventId);
 }

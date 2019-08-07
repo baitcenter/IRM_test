@@ -24,6 +24,28 @@ class CalendarServiceBackend extends CalendarService {
     return false;
   }
 
+  Future<bool> updateEventInPhone(Event event) async {
+    try {
+      Result result = await deviceCalendarPlugin.createOrUpdateEvent(event);
+      return result.isSuccess;
+    } catch (e) {
+      print(e);
+      print('error creating at webservice level');
+    }
+    return false;
+  }
+
+  Future<bool> deleteEventFromPhone(String calendarId, String eventId) async {
+    try {
+      Result result =
+          await deviceCalendarPlugin.deleteEvent(calendarId, eventId);
+      return result.isSuccess;
+    } catch (e) {
+      print('error deleting event: $eventId');
+    }
+    return false;
+  }
+
   @override
   Future<List<Event>> getEventsFromPhone(
       DateTime today, String calendarId) async {
