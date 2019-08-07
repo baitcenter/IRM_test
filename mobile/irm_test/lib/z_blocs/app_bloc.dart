@@ -119,7 +119,7 @@ class AppBloc {
     var hasPermission = await requestAccessToCalendar();
     if (!hasPermission) return;
     var currentUser = await userService.getUser();
-    if (currentUser == null) {
+    if (currentUser.userName == '') {
       defineStep(StartUp.userNameSelect);
       return;
     }

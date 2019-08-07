@@ -13,10 +13,16 @@ class AgendaBloc {
   AgendaBloc(this._calendarService, this._appBloc) {
     //initialize events
     checkToday = today.listen((today) {
+      print('listen');
       selectedCalendar = _appBloc.selectedCalendar.listen((calendar) {
+        print('listen to appbloc');
+        //somehow, the bit below now causes crash in ios if coming from short route
         _calendarService.getEvents(today, calendar.id).then((events) {
+          print('got events');
           var eventsMap = convertListToMap(events);
+          print('mapped');
           _events.value = eventsMap;
+          print('event value set');
         });
       });
     });

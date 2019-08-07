@@ -26,6 +26,7 @@ class CalendarServiceBackend extends CalendarService {
 
   @override
   Future<List<Event>> getEvents(DateTime today, String calendarId) async {
+    print('launching get Events');
     //TO DO pass retrieveEventParams as parameter
     // TODO: implement getEvents
     RetrieveEventsParams retrieveEventsParams = RetrieveEventsParams(
