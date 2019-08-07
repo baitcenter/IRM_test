@@ -5,7 +5,8 @@ import 'package:irm_test/z_services/calendar_service/extended_event.dart';
 class CalendarServiceFake extends CalendarService {
   DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
   @override
-  Future<List<Event>> getEvents(DateTime today, String calendarId) async {
+  Future<List<Event>> getEventsFromPhone(
+      DateTime today, String calendarId) async {
     // TODO: implement getEvents
     final _selectedDay = today;
 
@@ -89,7 +90,7 @@ class CalendarServiceFake extends CalendarService {
   }
 
   @override
-  getEventsFromDB() {
+  Future<List<ExtendedEvent>> getEventsFromDB(User user) {
     // TODO: implement getEventsFromDB
     return null;
   }
