@@ -68,10 +68,6 @@ app.get('/getallusers', (req, res) => {
     });
 });
 
-app.post('/updateuser', (req, res) => res.send('update user details in MongoDB'));
-app.delete('/userdelete', (req, res) => res.send('delete user in MongoDB'));
-
-
 //using post as long as no middleware
 app.post('/getevents', (req, res) => {
 
@@ -105,15 +101,28 @@ app.post('/createevent', (req, res) => {
         return;
     })
 });
-app.post('/updateevent', (req, res) => res.send('update event details in MongoDB'));
-
-app.delete('/eventdelete', (req, res) => {
+app.post('/updateevent', (req, res) => {
+    let reqBody=req.body;
+    console.log (reqBody);
     try {
-        let erase = myDB.collection('calendar').deleteOne({ "event.eventId": req.body.event.eventId });
-        console.log(" #event deleted from database: ", erase.nRemoved);
+       result =  myDB.collection('calendar').replaceOne({$and:[{"event.eventId":reqBody.event.eventId},{"owner.userName":reqBody.owner.userName}]},reqBody);
         res.status(200);
-        let message = erase.nRemoved.toString() + " event(s) deleted";
-        res.send(message);
+        console.log('event updated');
+        res.send('event updated');
+    }
+        catch(e){
+            console.log(e);
+            res.status(418);
+            res.send(e);
+        }
+    });
+
+//TO DO: send different msg if event already deleted
+app.delete('/deleteevent', (req, res) => {
+    try {
+        let erase = myDB.collection('calendar').deleteOne({ "event.eventId": req.query.eventId },{"owner.userName":req.query.user});
+        res.status(200);
+        res.send('event deleted');
     } catch (e) {
         console.log(e);
         res.status(418);
