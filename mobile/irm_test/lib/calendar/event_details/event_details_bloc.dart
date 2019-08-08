@@ -37,12 +37,14 @@ class EventDetailsBloc {
   Future<bool> deleteEvent(ExtendedEvent extendedEvent) async {
     var phoneEvents = _phoneEvents.value;
     String eventId;
+    Event eventFromPhone;
     for (var phoneEvent in phoneEvents) {
       var event = extendedEvent.event;
       if (phoneEvent.title == event.title &&
           phoneEvent.start == event.start &&
           phoneEvent.end == event.end) {
         eventId = phoneEvent.eventId;
+        eventFromPhone = phoneEvent;
       }
     }
     try {
@@ -59,6 +61,7 @@ class EventDetailsBloc {
       print('error deleting from DB: $err');
       return false;
     }
+    agendaBloc.removeEventFromStreams(eventFromPhone, extendedEvent);
     return true;
   }
 

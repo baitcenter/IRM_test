@@ -51,6 +51,12 @@ class _InAppCalendarState extends State<InAppCalendar>
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
+    print(widget.events);
+    if (widget.events[widget.today] == null || widget.events == {}) {
+      _selectedEvents = [];
+    } else {
+      _selectedEvents = widget.events[widget.today];
+    }
     _agendaBloc ??= BlocProvider.of(context).agendaBloc;
   }
 

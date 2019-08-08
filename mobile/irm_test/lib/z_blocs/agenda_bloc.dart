@@ -56,6 +56,11 @@ class AgendaBloc {
     return;
   }
 
+  void removeEventFromStreams(Event event, ExtendedEvent extendedEvent) {
+    _eventsFromDB.value.remove(extendedEvent);
+    _eventsFromPhone.value.remove(event);
+  }
+
   ExtendedEvent retrieveExtendedEvent(Event event) {
     var eventsFromDb = _eventsFromDB.value;
     for (var dbEvent in eventsFromDb) {
@@ -99,8 +104,11 @@ class AgendaBloc {
   void prepareEventsForDisplayAndUpdatePhone(
       DateTime today, String calendarId) async {
     fetchEventsFromPhoneAndDb(today, calendarId).then((_) {
-      var eventsMap = syncEventsFromPhoneAndDb(
-          _eventsFromDB.value, _eventsFromPhone.value, _user.value);
+      List<Event> eventsList = [];
+      eventsList = filterDbEvents(eventsList, _eventsFromDB.value, _user.value);
+
+      Map<DateTime, List> eventsMap = convertListToMap(eventsList);
+      ;
       _eventsToDisplay.value = eventsMap;
       updatePhoneCalendar(_eventsFromDB.value, _eventsFromPhone.value);
     });
@@ -122,29 +130,29 @@ class AgendaBloc {
     return true;
   }
 
-  Map<DateTime, List> syncEventsFromPhoneAndDb(
-      List<ExtendedEvent> fromDb, List<Event> phone, User user) {
-    List<Event> eventsList = [];
-    eventsList = filterDbEvents(eventsList, fromDb, user);
-    Map<DateTime, List> eventsMap = {};
-
-    //Below code was to show events from phone outside of agenda. Code needs to be restructured to avoid error
-/*    if (eventsList.isNotEmpty && phone.isNotEmpty) {
-      for (var e in eventsList) {
-        for (var p in phone) {
-          if (e.title != p.title) {
-            eventsList.add(p);
-          }
-        }
+  List<Event> filterDbEvents(
+      List<Event> eventsList, List<ExtendedEvent> fromDb, User user) {
+    for (var extendedEvent in fromDb) {
+      if (extendedEvent.owner.userName == user.userName &&
+          !extendedEvent.isCancelled) {
+        eventsList.add(extendedEvent.event);
       }
-    }*/
-    if (fromDb.isEmpty && phone.isNotEmpty) {
-      eventsMap = convertListToMap(phone);
-      return eventsMap;
-    }
+      List<Guest> isGuest = extendedEvent.guests
+          .where((guest) => guest.name == user.userName)
+          .toList();
+      print(isGuest.isNotEmpty);
 
-    eventsMap = convertListToMap(eventsList);
-    return eventsMap;
+      if (isGuest.isNotEmpty &&
+          !extendedEvent.isCancelled &&
+          isGuest[0].isAttending != 2) {
+        eventsList.add(extendedEvent.event);
+      }
+    }
+    //replace calendarId by user's to allow writing on phone
+    for (var e in eventsList) {
+      e.calendarId = _selectedCalendar.value.id;
+    }
+    return eventsList;
   }
 
   void updatePhoneCalendar(
@@ -195,31 +203,6 @@ class AgendaBloc {
     print(eventDate);
 
     return todayDate == eventDate;
-  }
-
-  List<Event> filterDbEvents(
-      List<Event> eventsList, List<ExtendedEvent> fromDb, User user) {
-    for (var extendedEvent in fromDb) {
-      if (extendedEvent.owner.userName == user.userName &&
-          !extendedEvent.isCancelled) {
-        eventsList.add(extendedEvent.event);
-      }
-      List<Guest> isGuest = extendedEvent.guests
-          .where((guest) => guest.name == user.userName)
-          .toList();
-      print(isGuest.isNotEmpty);
-
-      if (isGuest.isNotEmpty &&
-          !extendedEvent.isCancelled &&
-          isGuest[0].isAttending != 2) {
-        eventsList.add(extendedEvent.event);
-      }
-    }
-    //replace calendarId by user's to allow writing on phone
-    for (var e in eventsList) {
-      e.calendarId = _selectedCalendar.value.id;
-    }
-    return eventsList;
   }
 
   dispose() {
