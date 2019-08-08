@@ -16,4 +16,19 @@ class MyUtils {
   static bool isUserOwner(ExtendedEvent extendedEvent, User user) {
     return extendedEvent.owner.uid == user.uid;
   }
+
+  static Event getEventFromExtendedEvent(
+      ExtendedEvent extendedEvent, List<Event> events) {
+    var title = extendedEvent.event.title;
+    var start = extendedEvent.event.start;
+    var end = extendedEvent.event.end;
+    var description = extendedEvent.event.description;
+    for (var event in events) {
+      if (event.description == description &&
+          event.title == title &&
+          event.start == start &&
+          event.end == end) return event;
+    }
+    return null;
+  }
 }

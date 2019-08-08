@@ -23,14 +23,12 @@ class _FieldStringState extends State<FieldString> {
   TextEditingController textController = TextEditingController();
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     textController.text = widget.userData;
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     textController.dispose();
   }

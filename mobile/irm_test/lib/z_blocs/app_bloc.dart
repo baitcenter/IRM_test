@@ -63,7 +63,6 @@ class AppBloc {
         return false;
       }
     }
-    print('access granted');
     _deviceAccessGranted.value = true;
     return true;
   }
@@ -125,12 +124,10 @@ class AppBloc {
   void checkExistingUserAndCalendar() async {
     //initializing userFromDb with values from empty User returned by service to avoid nested if statements
     User userFromDB = User(userName: '', calendar: null, uid: '');
-    print('cursed function starting');
     var userFB = await authService.getCurrentUser();
     if (userFB.uid != null) {
       userFromDB = await userService.getUser();
       _user.value = userFromDB;
-      print('user received from DB');
     }
     if (userFromDB.userName == '') {
       defineStep(StartUp.userNameSelect);
@@ -164,7 +161,6 @@ class AppBloc {
   //Set user name and create in DB
   void updateUserName(String userName) {
     _userName.value = userName;
-    print('username set: ${_userName.value}');
     return;
   }
 
@@ -181,10 +177,7 @@ class AppBloc {
 
   //Retrieve and select Calendars
   void selectCalendar(Calendar calendar) {
-    print('selecting calendar');
     _selectedCalendar.value = calendar;
-    print('calendar selected: ${_selectedCalendar.value.id}');
-    //defineStep(StartUp.agenda);
     return;
   }
 
