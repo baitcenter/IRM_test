@@ -105,6 +105,18 @@ class AgendaBloc {
         eventMap[today].add(event);
       }
     }
+    //FIX: without this calendar only display events from DB for the current day
+    for (var event in eventList) {
+      var date = DateFormat('yyy-MM-dd').format(event.start);
+      var day = DateTime.parse(date + ' 00:00:00.000');
+      var dateOfToday = DateFormat('yyy-MM-dd').format(today);
+      if (date != dateOfToday) {
+        if (eventMap[day] == null) {
+          eventMap[day] = [];
+        }
+        eventMap[day].add(event);
+      }
+    }
     return eventMap;
   }
 
@@ -121,8 +133,7 @@ class AgendaBloc {
   void prepareEventsForDisplayAndUpdatePhone(
       DateTime today, String calendarId) async {
     fetchEventsFromPhoneAndDb(today, calendarId).then((_) {
-      List<Event> eventsList = [];
-      eventsList = filterDbEvents(eventsList, _eventsFromDB.value, _user.value);
+      List<Event> eventsList = filterDbEvents(_eventsFromDB.value, _user.value);
 
       Map<DateTime, List> eventsMap = convertListToMap(eventsList);
 
@@ -145,24 +156,10 @@ class AgendaBloc {
     return true;
   }
 
-  List<Event> filterDbEvents(
-      List<Event> eventsList, List<ExtendedEvent> fromDb, User user) {
-    for (var extendedEvent in fromDb) {
-      if (extendedEvent.owner.userName == user.userName &&
-          !extendedEvent.isCancelled) {
-        eventsList.add(extendedEvent.event);
-      }
-      List<Guest> isGuest = extendedEvent.guests
-          .where((guest) => guest.name == user.userName)
-          .toList();
-      print(isGuest.isNotEmpty);
-
-      if (isGuest.isNotEmpty &&
-          !extendedEvent.isCancelled &&
-          isGuest[0].isAttending != 2) {
-        eventsList.add(extendedEvent.event);
-      }
-    }
+  List<Event> filterDbEvents(List<ExtendedEvent> fromDb, User user) {
+    List<Event> eventsList = List<Event>.from(fromDb.map((extendedEvent) {
+      return extendedEvent.event;
+    }));
     //replace calendarId by user's to allow writing on phone
     for (var e in eventsList) {
       e.calendarId = _selectedCalendar.value.id;
