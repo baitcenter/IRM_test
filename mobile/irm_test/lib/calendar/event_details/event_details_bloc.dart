@@ -65,6 +65,18 @@ class EventDetailsBloc {
     return true;
   }
 
+  Future<ExtendedEvent> acceptOrDeclineEvent(
+      int rsvp, ExtendedEvent extendedEvent) async {
+    User user = _user.value;
+    for (var guest in extendedEvent.guests) {
+      if (guest.user.uid == user.uid) {
+        guest.isAttending = rsvp;
+      }
+    }
+    await calendarService.updateEventInDB(extendedEvent);
+    return extendedEvent;
+  }
+
   dispose() {
     _calendarId.dispose();
     _phoneEvents.dispose();
