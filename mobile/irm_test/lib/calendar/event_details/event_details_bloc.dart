@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
+import 'package:irm_test/utils/utils.dart';
 import 'package:irm_test/z_blocs/agenda_bloc.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_services/calendar_service/calendar_service.dart';
@@ -50,7 +51,7 @@ class EventDetailsBloc {
     try {
       var deletedOnPhone = await calendarService.deleteEventFromPhone(
           _calendarId.value, eventId);
-      print(deletedOnPhone);
+      print('deleted on phone: $deletedOnPhone');
     } catch (e) {
       print('error deleting event from phone: $e');
     }
@@ -62,11 +63,13 @@ class EventDetailsBloc {
       return false;
     }
     agendaBloc.removeEventFromStreams(eventFromPhone, extendedEvent);
+    agendaBloc.notifyEventUpdate(true);
     return true;
   }
 
   Future<ExtendedEvent> acceptOrDeclineEvent(
       int rsvp, ExtendedEvent extendedEvent) async {
+    print('extended event event ID: ${extendedEvent.event.eventId}');
     User user = _user.value;
     for (var guest in extendedEvent.guests) {
       if (guest.user.uid == user.uid) {
@@ -74,6 +77,7 @@ class EventDetailsBloc {
       }
     }
     await calendarService.updateEventInDB(extendedEvent);
+
     return extendedEvent;
   }
 

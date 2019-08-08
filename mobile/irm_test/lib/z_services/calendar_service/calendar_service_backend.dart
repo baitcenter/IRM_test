@@ -32,7 +32,7 @@ class CalendarServiceBackend extends CalendarService {
     RetrieveEventsParams retrieveEventsParams = RetrieveEventsParams(
         //TO DO input correct parameters
         startDate: DateTime.now(),
-        endDate: DateTime.now().add(Duration(days: 7)));
+        endDate: DateTime.now().add(Duration(days: 30)));
     Result result = await deviceCalendarPlugin.retrieveEvents(
         calendarId, retrieveEventsParams);
     return result.data;
@@ -70,9 +70,6 @@ class CalendarServiceBackend extends CalendarService {
           'Content-Type': 'application/json',
         },
         body: json.encode(event.toJson()));
-    print('event creation code : ${response.statusCode}');
-    print('body: ${response.body}');
-
     if (response.statusCode >= 200 && response.statusCode < 300) {
       print('event DB all OK');
       return true;
@@ -116,7 +113,6 @@ class CalendarServiceBackend extends CalendarService {
       ),
     );
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      print('event successfully updated');
       return true;
     }
     return false;
@@ -129,17 +125,13 @@ class CalendarServiceBackend extends CalendarService {
     };
     Uri uri = Uri.https(host, '/deleteevent', queryParameters);
 
-    print('deleting event in DB');
-
     var response = await http.delete(
       uri,
       headers: {
         'Content-Type': 'application/json',
       },
     );
-    print('delete query completed server side');
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      print('event successfully deleted');
       return true;
     }
     return false;

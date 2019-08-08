@@ -22,6 +22,9 @@ class AgendaBloc {
       selectedCalendar = _appBloc.selectedCalendar.listen((calendar) {
         _selectedCalendar.value = calendar;
         prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
+        Timer.periodic(Duration(seconds: 300), (timer) {
+          prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
+        });
       });
     });
 
@@ -34,6 +37,7 @@ class AgendaBloc {
   StreamSubscription checkToday;
   StreamSubscription userListener;
   StreamSubscription notifyUpdate;
+  Timer timer;
 
   var _eventsToDisplay = StreamedValue<Map<DateTime, List>>();
   var _today = StreamedValue<DateTime>();
@@ -108,7 +112,6 @@ class AgendaBloc {
     List<ExtendedEvent> eventsFromDB;
     try {
       eventsFromDB = await _calendarService.getEventsFromDB(user);
-      print('eventsFromDB API call: $eventsFromDB');
     } catch (e) {
       print('problem with events API call: $e');
     }
@@ -122,7 +125,7 @@ class AgendaBloc {
       eventsList = filterDbEvents(eventsList, _eventsFromDB.value, _user.value);
 
       Map<DateTime, List> eventsMap = convertListToMap(eventsList);
-      ;
+
       _eventsToDisplay.value = eventsMap;
       updatePhoneCalendar(_eventsFromDB.value, _eventsFromPhone.value);
     });
@@ -134,10 +137,8 @@ class AgendaBloc {
       var eventsFromPhone =
           await _calendarService.getEventsFromPhone(today, calendarId);
       _eventsFromPhone.value = eventsFromPhone;
-      print('phone events: ${_eventsFromPhone.value}');
       var eventsFromDB = await getEventsFromDB(_user.value);
       _eventsFromDB.value = eventsFromDB;
-      print('db events: ${_eventsFromDB.value}');
     } catch (e) {
       print('error fetching events :$e');
     }
@@ -186,19 +187,17 @@ class AgendaBloc {
       //if guest event exists on phone, delete and replace with version from DB
       //else just create it
       if (invitation != null) {
+        invitation.eventId = null;
         for (var phoneEvent in fromPhone) {
           //Add more conditions to avoid wrong results.
           if (phoneEvent.title == invitation.title &&
               phoneEvent.start == invitation.start) {
+            await _calendarService.deleteEventFromPhone(
+                _selectedCalendar.value.id, phoneEvent.eventId);
             var createInvitation =
                 await _calendarService.createEventInPhone(invitation);
             print(
                 'existing event recreated on phone:${invitation.title} : $createInvitation');
-            if (createInvitation) {
-              var deleted = await _calendarService.deleteEventFromPhone(
-                  _selectedCalendar.value.id, phoneEvent.eventId);
-              print('event deleted: ${phoneEvent.title}: $deleted');
-            }
           } else {
             var createInvitation =
                 await _calendarService.createEventInPhone(invitation);
@@ -208,6 +207,7 @@ class AgendaBloc {
         }
       }
     }
+    return;
   }
 
   bool compareDates(DateTime today, DateTime event) {
@@ -232,5 +232,6 @@ class AgendaBloc {
     notifyUpdate.cancel();
     selectedCalendar.cancel();
     userListener.cancel();
+    timer.cancel();
   }
 }

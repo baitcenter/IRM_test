@@ -17,8 +17,6 @@ class UserServiceHttp extends UserService {
 
     Uri uri = Uri.https(host, '/getuser', queryParameters);
 
-    print('sending get request');
-
     var response =
         await http.get(uri, headers: {'Content-Type': 'application/json'});
 
@@ -28,7 +26,6 @@ class UserServiceHttp extends UserService {
           List<User>.from(jsonBody.map((user) => User.fromJson(user)));
       if (userList.isNotEmpty) {
         User result = userList[0];
-        print('request ok, sending user');
         print(result.userName);
 
         return result;
@@ -60,7 +57,6 @@ class UserServiceHttp extends UserService {
       if (jsonBody != []) {
         var result =
             List<User>.from(jsonBody.map((user) => User.fromJson(user)));
-        print("all users sent");
         return result;
       }
       print('user list empty');
@@ -87,7 +83,6 @@ class UserServiceHttp extends UserService {
           "calendar": calendarJson,
           "uid": firebaseUser.uid
         }));
-    print('create user status code : ${response.statusCode}');
     if (response.statusCode == 200 && response.statusCode <= 300) {
       return true;
     }
