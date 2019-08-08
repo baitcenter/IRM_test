@@ -31,6 +31,7 @@ class _FieldDateState extends State<FieldDate> {
     super.initState();
     _controller = MaskedTextController(mask: widget.format);
     _controller.text = widget.userData;
+    widget.updater(widget.userData);
   }
 
   @override

@@ -186,14 +186,15 @@ class CreateEventBloc {
     List<Attendee> calendarAttendees = List<Attendee>.from(
         _selectedAttendees.value.map((user) => Attendee(user.userName)));
 
-//TO DO: put location in description as workaround to library shortcoming
-    var event = Event(
-      calendarId,
-      title: _eventTitle.value,
-      start: startDateAndTime,
-      end: endDateAndTime,
-      description: _eventDescription.value,
-    )
+    //put location in description as workaround to library shortcoming
+    var description =
+        'Location: ${_eventLocation.value}\n${_eventDescription.value}';
+
+    var event = Event(calendarId,
+        title: _eventTitle.value,
+        start: startDateAndTime,
+        end: endDateAndTime,
+        description: description)
       ..location = _eventLocation.value
       ..attendees = calendarAttendees;
 
