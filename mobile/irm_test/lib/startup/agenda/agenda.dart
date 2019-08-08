@@ -2,11 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
 import 'package:irm_test/calendar/in_app_calendar/in_app_calendar.dart';
-import 'package:irm_test/services.dart';
-import 'package:irm_test/startup/agenda/agenda_bloc.dart';
-import 'package:irm_test/z_blocs/app_bloc.dart';
+import 'package:irm_test/z_blocs/agenda_bloc.dart';
 import 'package:irm_test/z_blocs/bloc_provider.dart';
-import 'package:irm_test/z_services/service_provider.dart';
 
 class Agenda extends StatefulWidget {
   @override
@@ -16,8 +13,6 @@ class Agenda extends StatefulWidget {
 class _AgendaState extends State<Agenda> {
   StreamSubscription _eventsListener;
   DateTime today;
-  AppBloc _appBloc;
-  CalendarService _calendarService;
   AgendaBloc _agendaBloc;
 
   @override
@@ -29,12 +24,7 @@ class _AgendaState extends State<Agenda> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _appBloc ??= BlocProvider.of(context).appBloc;
-    _calendarService ??= ServiceProvider.of(context).calendarService;
-    _agendaBloc ??= AgendaBloc(
-      _calendarService,
-      _appBloc,
-    );
+    _agendaBloc ??= BlocProvider.of(context).agendaBloc;
     _agendaBloc.setToday(today);
     print('today set');
     _eventsListener ??= _agendaBloc.events.listen((events) {

@@ -182,7 +182,7 @@ class CreateEventBloc {
     _eventToSend.value = event;
 
     try {
-      bool isCreated = await calendarService.createEvent(event);
+      bool isCreated = await calendarService.createEventInPhone(event);
       if (isCreated) {
         print('event created');
         return true;

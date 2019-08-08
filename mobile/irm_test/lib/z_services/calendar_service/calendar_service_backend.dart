@@ -12,7 +12,7 @@ class CalendarServiceBackend extends CalendarService {
   CalendarServiceBackend(this.host);
   @override
   //TO DO check return type
-  Future<bool> createEvent(Event event) async {
+  Future<bool> createEventInPhone(Event event) async {
     try {
       Result result = await deviceCalendarPlugin.createOrUpdateEvent(event);
       event.eventId = result.data;
@@ -42,6 +42,29 @@ class CalendarServiceBackend extends CalendarService {
       return result.isSuccess;
     } catch (e) {
       print('error deleting event: $eventId');
+    }
+    return false;
+  }
+
+  Future<bool> deleteEventFromDB(ExtendedEvent extendedEvent) async {
+    Map<String, String> queryParameters = {
+      'eventId': extendedEvent.event.eventId,
+      'user': extendedEvent.owner.userName
+    };
+    Uri uri = Uri.https(host, '/deleteevent', queryParameters);
+
+    print('deleting event in DB');
+
+    var response = await http.delete(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+    print('delete query completed server side');
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      print('event successfully deleted');
+      return true;
     }
     return false;
   }
