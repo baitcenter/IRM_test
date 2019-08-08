@@ -68,7 +68,7 @@ class CalendarServiceFake extends CalendarService {
   }
 
   @override
-  Future<bool> createEvent(Event event) async {
+  Future<bool> createEventInPhone(Event event) async {
     // TODO: implement createEvent
     try {
       Result result = await deviceCalendarPlugin.createOrUpdateEvent(event);
@@ -104,6 +104,12 @@ class CalendarServiceFake extends CalendarService {
   @override
   Future<bool> deleteEventFromPhone(String calendarId, String eventId) {
     // TODO: implement deleteEventFromPhone
+    return null;
+  }
+
+  @override
+  Future<bool> deleteEventFromDB(ExtendedEvent extendedEvent) {
+    // TODO: implement deleteEventFromDB
     return null;
   }
 }

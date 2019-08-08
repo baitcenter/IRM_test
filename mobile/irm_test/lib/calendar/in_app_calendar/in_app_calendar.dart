@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:irm_test/calendar/create_event/create_event.dart';
+import 'package:irm_test/calendar/event_details/event_details.dart';
+import 'package:irm_test/z_blocs/agenda_bloc.dart';
+import 'package:irm_test/z_blocs/bloc_provider.dart';
+import 'package:irm_test/z_services/calendar_service/extended_event.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class InAppCalendar extends StatefulWidget {
@@ -19,6 +23,7 @@ class _InAppCalendarState extends State<InAppCalendar>
   List _selectedEvents;
   AnimationController _animationController;
   CalendarController _calendarController;
+  AgendaBloc _agendaBloc;
 
   @override
   void initState() {
@@ -40,6 +45,13 @@ class _InAppCalendarState extends State<InAppCalendar>
     );
 
     _animationController.forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    _agendaBloc ??= BlocProvider.of(context).agendaBloc;
   }
 
   @override
@@ -150,8 +162,13 @@ class _InAppCalendarState extends State<InAppCalendar>
               .map((event) => _eventTile(
                     child: ListTile(
                       title: Text(event.title),
-                      onTap: () => print(
-                          '$event tapped!'), //TO DO: go to edit event + delete option
+                      onTap: () {
+                        print('${event.title} tapped!');
+                        var extendedEvent =
+                            _agendaBloc.retrieveExtendedEvent(event);
+                        print(extendedEvent);
+                        _goToEventDetails(context, extendedEvent);
+                      },
                     ),
                   ))
               .toList()
@@ -173,5 +190,12 @@ class _InAppCalendarState extends State<InAppCalendar>
   void _goToCreateEvent(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => CreateEvent()));
+  }
+
+  void _goToEventDetails(BuildContext context, ExtendedEvent extendedEvent) {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => EventDetails(
+              extendedEvent: extendedEvent,
+            )));
   }
 }

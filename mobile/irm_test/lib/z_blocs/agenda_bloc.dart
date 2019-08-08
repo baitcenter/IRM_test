@@ -3,6 +3,7 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
 import 'package:intl/intl.dart';
 import 'package:irm_test/services.dart';
+import 'package:irm_test/utils/utils.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_services/calendar_service/extended_event.dart';
 import 'package:irm_test/z_services/calendar_service/guest.dart';
@@ -34,13 +35,43 @@ class AgendaBloc {
   var _eventsFromPhone = StreamedValue<List<Event>>();
   var _user = StreamedValue<User>();
   var _selectedCalendar = StreamedValue<Calendar>();
+  var _selectedEvent = StreamedValue<Event>();
+  var _selectedExtendedEvent = StreamedValue<ExtendedEvent>();
 
   Stream<Map<DateTime, List>> get events => _eventsToDisplay.outStream;
   Stream<DateTime> get today => _today.outStream;
 
+  Stream get selectedEvent => _selectedEvent.outStream;
+  Stream get selectedExtendedEvent => _selectedExtendedEvent.outStream;
+
+  Stream get phoneEvents => _eventsFromPhone.outStream;
+
   void setToday(DateTime today) {
     _today.value = today;
     return;
+  }
+
+  void selectEvent(Event event) {
+    _selectedEvent.value = event;
+    return;
+  }
+
+  ExtendedEvent retrieveExtendedEvent(Event event) {
+    var eventsFromDb = _eventsFromDB.value;
+    for (var dbEvent in eventsFromDb) {
+      var user = _user.value;
+      var isGuest = MyUtils.isUserGuest(dbEvent.guests, user);
+      var title = dbEvent.event.title;
+      var start = dbEvent.event.start;
+      var matchTitle = title == event.title;
+      var matchStart = start == event.start;
+      var matchOwner = MyUtils.isUserOwner(dbEvent, user);
+
+      if ((matchTitle && matchStart) && (matchOwner || isGuest)) {
+        return dbEvent;
+      }
+    }
+    return null;
   }
 
   Map<DateTime, List> convertListToMap(List<Event> eventList) {
@@ -120,7 +151,7 @@ class AgendaBloc {
       List<ExtendedEvent> fromDB, List<Event> fromPhone) async {
     for (var dbEvent in fromDB) {
       if (dbEvent.owner.uid == _user.value.uid) {
-        var updated = await _calendarService.createEvent(dbEvent.event);
+        var updated = await _calendarService.createEventInPhone(dbEvent.event);
         print('event${dbEvent.event} updated: $updated');
       }
 
@@ -138,7 +169,7 @@ class AgendaBloc {
           if (phoneEvent.title == invitation.title &&
               phoneEvent.start == invitation.start) {
             var createInvitation =
-                await _calendarService.createEvent(invitation);
+                await _calendarService.createEventInPhone(invitation);
             print(
                 'existing event recreated on phone:${invitation.title} : $createInvitation');
             if (createInvitation) {
@@ -148,7 +179,7 @@ class AgendaBloc {
             }
           } else {
             var createInvitation =
-                await _calendarService.createEvent(invitation);
+                await _calendarService.createEventInPhone(invitation);
             print(
                 ' new event created on phone:${invitation.title} : $createInvitation');
           }
@@ -196,6 +227,8 @@ class AgendaBloc {
     _eventsFromDB.dispose();
     _eventsFromPhone.dispose();
     _selectedCalendar.dispose();
+    _selectedEvent.dispose();
+    _selectedExtendedEvent.dispose();
     _today.dispose();
     _user.dispose();
     checkToday.cancel();
