@@ -70,6 +70,8 @@ app.get('/getallusers', (req, res) => {
 
 app.post('/updateuser', (req, res) => res.send('update user details in MongoDB'));
 app.delete('/userdelete', (req, res) => res.send('delete user in MongoDB'));
+
+
 //using post as long as no middleware
 app.post('/getevents', (req, res) => {
 
@@ -105,6 +107,16 @@ app.post('/createevent', (req, res) => {
 });
 app.post('/updateevent', (req, res) => res.send('update event details in MongoDB'));
 app.delete('/eventdelete', (req, res) => {
+    let erase = myDB.collection('calendar').remove({"event.eventId":req.body.event.eventId});
+    if (erase.hasWriteError){
+        res.status(418);
+        return res.send(erase.writeError.errmsg);
+    }
+    console.log(" #event deleted from database: ", erase.nRemoved);
+    res.status(200);
+    let message = erase.nRemoved.toString()+" event(s) deleted";
+    res.send(message);
+
 });
 
 
