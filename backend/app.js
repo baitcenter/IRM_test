@@ -106,16 +106,20 @@ app.post('/createevent', (req, res) => {
     })
 });
 app.post('/updateevent', (req, res) => res.send('update event details in MongoDB'));
+
 app.delete('/eventdelete', (req, res) => {
-    let erase = myDB.collection('calendar').remove({"event.eventId":req.body.event.eventId});
-    if (erase.hasWriteError){
+    try{
+        let erase=myDB.collection('calendar').deleteOne({"event.eventId":req.body.event.eventId});
+        console.log(" #event deleted from database: ", erase.nRemoved);
+        res.status(200);
+        let message = erase.nRemoved.toString()+" event(s) deleted";
+        res.send(message);} catch(e){
+        console.log(e);
         res.status(418);
-        return res.send(erase.writeError.errmsg);
+        return res.send(e);
     }
-    console.log(" #event deleted from database: ", erase.nRemoved);
-    res.status(200);
-    let message = erase.nRemoved.toString()+" event(s) deleted";
-    res.send(message);
+
+    
 
 });
 
