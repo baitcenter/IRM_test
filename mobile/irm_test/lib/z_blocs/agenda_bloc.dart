@@ -24,10 +24,16 @@ class AgendaBloc {
         prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
       });
     });
+
+    notifyUpdate = updateStream.listen((ping) {
+      prepareEventsForDisplayAndUpdatePhone(
+          _today.value, _selectedCalendar.value.id);
+    });
   }
   StreamSubscription selectedCalendar;
   StreamSubscription checkToday;
   StreamSubscription userListener;
+  StreamSubscription notifyUpdate;
 
   var _eventsToDisplay = StreamedValue<Map<DateTime, List>>();
   var _today = StreamedValue<DateTime>();
@@ -37,6 +43,7 @@ class AgendaBloc {
   var _selectedCalendar = StreamedValue<Calendar>();
   var _selectedEvent = StreamedValue<Event>();
   var _selectedExtendedEvent = StreamedValue<ExtendedEvent>();
+  var _notifyEventsUpdated = StreamedValue<bool>();
 
   Stream<Map<DateTime, List>> get events => _eventsToDisplay.outStream;
   Stream<DateTime> get today => _today.outStream;
@@ -45,6 +52,13 @@ class AgendaBloc {
   Stream get selectedExtendedEvent => _selectedExtendedEvent.outStream;
 
   Stream get phoneEvents => _eventsFromPhone.outStream;
+
+  Stream get updateStream => _notifyEventsUpdated.outStream;
+
+  void notifyEventUpdate(bool ping) {
+    _notifyEventsUpdated.value = ping;
+    return;
+  }
 
   void setToday(DateTime today) {
     _today.value = today;
@@ -215,6 +229,7 @@ class AgendaBloc {
     _today.dispose();
     _user.dispose();
     checkToday.cancel();
+    notifyUpdate.cancel();
     selectedCalendar.cancel();
     userListener.cancel();
   }

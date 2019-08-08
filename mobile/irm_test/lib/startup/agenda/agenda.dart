@@ -41,14 +41,8 @@ class _AgendaState extends State<Agenda> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamedWidget(
-        noDataChild: Container(color: Colors.green),
-        stream: _agendaBloc.events,
-        builder: (context, snapshot) {
-          return InAppCalendar(
-            events: snapshot.data,
-            today: today,
-          );
-        });
+    return InAppCalendar(
+      today: today,
+    );
   }
 }
