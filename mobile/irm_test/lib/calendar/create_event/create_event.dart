@@ -153,6 +153,7 @@ class _CreateEventState extends State<CreateEvent> {
             onPressed: () {
               _createEventBloc
                   .createEventInDbAndLocally(calendarSnapshot.data.id);
+              Navigator.of(context).pop();
               //TO DO:Refactor: export in "builder"
             },
           );
