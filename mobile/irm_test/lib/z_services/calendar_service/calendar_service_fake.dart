@@ -112,4 +112,10 @@ class CalendarServiceFake extends CalendarService {
     // TODO: implement deleteEventFromDB
     return null;
   }
+
+  @override
+  Future<bool> updateEventInDB(ExtendedEvent extendedEvent) {
+    // TODO: implement updateEventInDB
+    return null;
+  }
 }

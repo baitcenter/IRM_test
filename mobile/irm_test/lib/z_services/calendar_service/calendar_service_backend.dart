@@ -10,6 +10,7 @@ class CalendarServiceBackend extends CalendarService {
   DeviceCalendarPlugin deviceCalendarPlugin = DeviceCalendarPlugin();
 
   CalendarServiceBackend(this.host);
+
   @override
   //TO DO check return type
   Future<bool> createEventInPhone(Event event) async {
@@ -22,6 +23,19 @@ class CalendarServiceBackend extends CalendarService {
       print('error creating at webservice level');
     }
     return false;
+  }
+
+  @override
+  Future<List<Event>> getEventsFromPhone(
+      DateTime today, String calendarId) async {
+    //TO DO pass retrieveEventParams as parameter
+    RetrieveEventsParams retrieveEventsParams = RetrieveEventsParams(
+        //TO DO input correct parameters
+        startDate: DateTime.now(),
+        endDate: DateTime.now().add(Duration(days: 7)));
+    Result result = await deviceCalendarPlugin.retrieveEvents(
+        calendarId, retrieveEventsParams);
+    return result.data;
   }
 
   Future<bool> updateEventInPhone(Event event) async {
@@ -44,42 +58,6 @@ class CalendarServiceBackend extends CalendarService {
       print('error deleting event: $eventId');
     }
     return false;
-  }
-
-  Future<bool> deleteEventFromDB(ExtendedEvent extendedEvent) async {
-    Map<String, String> queryParameters = {
-      'eventId': extendedEvent.event.eventId,
-      'user': extendedEvent.owner.userName
-    };
-    Uri uri = Uri.https(host, '/deleteevent', queryParameters);
-
-    print('deleting event in DB');
-
-    var response = await http.delete(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-    print('delete query completed server side');
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      print('event successfully deleted');
-      return true;
-    }
-    return false;
-  }
-
-  @override
-  Future<List<Event>> getEventsFromPhone(
-      DateTime today, String calendarId) async {
-    //TO DO pass retrieveEventParams as parameter
-    RetrieveEventsParams retrieveEventsParams = RetrieveEventsParams(
-        //TO DO input correct parameters
-        startDate: DateTime.now(),
-        endDate: DateTime.now().add(Duration(days: 7)));
-    Result result = await deviceCalendarPlugin.retrieveEvents(
-        calendarId, retrieveEventsParams);
-    return result.data;
   }
 
   @override
@@ -123,5 +101,47 @@ class CalendarServiceBackend extends CalendarService {
       return eventsList;
     }
     return [];
+  }
+
+  Future<bool> updateEventInDB(ExtendedEvent extendedEvent) async {
+    Uri uri = Uri.https(host, '/updateevent');
+
+    var response = await http.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(
+        extendedEvent.toJson(),
+      ),
+    );
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      print('event successfully updated');
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> deleteEventFromDB(ExtendedEvent extendedEvent) async {
+    Map<String, String> queryParameters = {
+      'eventId': extendedEvent.event.eventId,
+      'user': extendedEvent.owner.userName
+    };
+    Uri uri = Uri.https(host, '/deleteevent', queryParameters);
+
+    print('deleting event in DB');
+
+    var response = await http.delete(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+    print('delete query completed server side');
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      print('event successfully deleted');
+      return true;
+    }
+    return false;
   }
 }
