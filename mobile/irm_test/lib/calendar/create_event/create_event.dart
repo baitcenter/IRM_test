@@ -6,6 +6,7 @@ import 'package:irm_test/services.dart';
 import 'package:irm_test/widgets/field_attendee.dart';
 import 'package:irm_test/widgets/field_date.dart';
 import 'package:irm_test/widgets/field_string.dart';
+import 'package:irm_test/z_blocs/agenda_bloc.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_blocs/bloc_provider.dart';
 import 'package:irm_test/z_services/service_provider.dart';
@@ -18,6 +19,7 @@ class CreateEvent extends StatefulWidget {
 class _CreateEventState extends State<CreateEvent> {
   String dropdownValue;
   UserService _userService;
+  AgendaBloc _agendaBloc;
   AppBloc _appBloc;
   CalendarService _calendarService;
   CreateEventBloc _createEventBloc;
@@ -28,9 +30,11 @@ class _CreateEventState extends State<CreateEvent> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _appBloc ??= BlocProvider.of(context).appBloc;
+    _agendaBloc ??= BlocProvider.of(context).agendaBloc;
     _userService ??= ServiceProvider.of(context).userService;
     _calendarService ??= ServiceProvider.of(context).calendarService;
-    _createEventBloc ??= CreateEventBloc(_userService, _calendarService);
+    _createEventBloc ??=
+        CreateEventBloc(_userService, _calendarService, _agendaBloc);
   }
 
   @override

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:frideos/frideos.dart';
 import 'package:irm_test/calendar/create_event/create_event.dart';
 import 'package:irm_test/calendar/event_details/event_details.dart';
 import 'package:irm_test/z_blocs/agenda_bloc.dart';
@@ -7,12 +10,11 @@ import 'package:irm_test/z_services/calendar_service/extended_event.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class InAppCalendar extends StatefulWidget {
-  final Map<DateTime, List> events;
+  //final Map<DateTime, List> events;
   final DateTime today;
 
-  const InAppCalendar({Key key, @required this.events, @required this.today})
-      : assert(events != null),
-        assert(today != null),
+  const InAppCalendar({Key key, @required this.today})
+      : assert(today != null),
         super(key: key);
   @override
   _InAppCalendarState createState() => _InAppCalendarState();
@@ -20,23 +22,15 @@ class InAppCalendar extends StatefulWidget {
 
 class _InAppCalendarState extends State<InAppCalendar>
     with TickerProviderStateMixin {
-  List _selectedEvents;
+  List _selectedEvents = [];
   AnimationController _animationController;
   CalendarController _calendarController;
   AgendaBloc _agendaBloc;
+  StreamSubscription _eventsListener;
 
   @override
   void initState() {
     super.initState();
-    print(widget.events);
-    if (widget.events[widget.today] == null || widget.events == {}) {
-      _selectedEvents = [];
-    } else {
-      _selectedEvents = widget.events[widget.today];
-    }
-
-    print('_selectedEvents:$_selectedEvents');
-
     _calendarController = CalendarController();
 
     _animationController = AnimationController(
@@ -51,19 +45,33 @@ class _InAppCalendarState extends State<InAppCalendar>
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    print(widget.events);
+    /*  print(widget.events);
     if (widget.events[widget.today] == null || widget.events == {}) {
       _selectedEvents = [];
     } else {
       _selectedEvents = widget.events[widget.today];
-    }
+    }*/
     _agendaBloc ??= BlocProvider.of(context).agendaBloc;
+    _eventsListener ??= _agendaBloc.events.listen((events) {
+      if (events[widget.today] == null) {
+        setState(() {
+          _selectedEvents = [];
+          print("_selectedEvents updated:[]");
+        });
+      } else {
+        setState(() {
+          _selectedEvents = events[widget.today];
+          print("_selectedEvents updated: not empty");
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     _calendarController.dispose();
+    _eventsListener.cancel();
     super.dispose();
   }
 
@@ -93,27 +101,31 @@ class _InAppCalendarState extends State<InAppCalendar>
 
   // Simple TableCalendar configuration (using Styles)
   Widget _buildTableCalendar() {
-    return TableCalendar(
-      calendarController: _calendarController,
-      events: widget.events,
-      // holidays: widget._holidays,
-      startingDayOfWeek: StartingDayOfWeek.monday,
-      calendarStyle: CalendarStyle(
-        selectedColor: Colors.deepOrange[400],
-        todayColor: Colors.deepOrange[200],
-        markersColor: Colors.brown[700],
-        outsideDaysVisible: false,
-      ),
-      headerStyle: HeaderStyle(
-        formatButtonTextStyle:
-            TextStyle().copyWith(color: Colors.white, fontSize: 15.0),
-        formatButtonDecoration: BoxDecoration(
-          color: Colors.deepOrange[400],
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-      ),
-      onDaySelected: _onDaySelected,
-    );
+    return StreamedWidget(
+        stream: _agendaBloc.events,
+        builder: (context, snapshot) {
+          return TableCalendar(
+            calendarController: _calendarController,
+            events: snapshot.data,
+            // holidays: widget._holidays,
+            startingDayOfWeek: StartingDayOfWeek.monday,
+            calendarStyle: CalendarStyle(
+              selectedColor: Colors.deepOrange[400],
+              todayColor: Colors.deepOrange[200],
+              markersColor: Colors.brown[700],
+              outsideDaysVisible: false,
+            ),
+            headerStyle: HeaderStyle(
+              formatButtonTextStyle:
+                  TextStyle().copyWith(color: Colors.white, fontSize: 15.0),
+              formatButtonDecoration: BoxDecoration(
+                color: Colors.deepOrange[400],
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+            ),
+            onDaySelected: _onDaySelected,
+          );
+        });
   }
 
   Widget _buildButtons() {

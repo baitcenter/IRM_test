@@ -1,16 +1,19 @@
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
 import 'package:irm_test/services.dart';
+import 'package:irm_test/z_blocs/agenda_bloc.dart';
 import 'package:irm_test/z_services/calendar_service/extended_event.dart';
 import 'package:irm_test/z_services/calendar_service/guest.dart';
 
 class CreateEventBloc {
   final UserService userService;
   final CalendarService calendarService;
+  final AgendaBloc agendaBloc;
 
   CreateEventBloc(
     this.userService,
     this.calendarService,
+    this.agendaBloc,
   ) {
     getAllUsersFromDB();
   }
@@ -140,7 +143,8 @@ class CreateEventBloc {
   void createEventInDbAndLocally(String calendarId) async {
     var createdLocally = await createEvent(calendarId);
     if (createdLocally) {
-      createEventInDb();
+      await createEventInDb();
+      agendaBloc.notifyEventUpdate(true);
       return;
     }
     print('error creating event in calendar and DB');
