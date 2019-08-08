@@ -49,7 +49,7 @@ class _EventDetailsState extends State<EventDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: Text('Event Details')),
       body: SafeArea(
         child: ListView(
           children: <Widget>[
@@ -105,8 +105,26 @@ class _EventDetailsState extends State<EventDetails> {
                 leading: Text('Your RSVP'),
                 title: _rsvp(widget.extendedEvent.guests, snapshot.data),
               ),
-              RaisedButton(child: Text('Accept')),
-              RaisedButton(child: Text('Decline')),
+              RaisedButton(
+                child: Text('Accept'),
+                onPressed: () {
+                  _eventDetailsBloc
+                      .acceptOrDeclineEvent(3, widget.extendedEvent)
+                      .then((_) {
+                    Navigator.of(context).pop();
+                  });
+                },
+              ),
+              RaisedButton(
+                child: Text('Decline'),
+                onPressed: () {
+                  _eventDetailsBloc
+                      .acceptOrDeclineEvent(2, widget.extendedEvent)
+                      .then((_) {
+                    Navigator.of(context).pop();
+                  });
+                },
+              ),
             ],
           );
         });
@@ -152,6 +170,7 @@ class _EventDetailsState extends State<EventDetails> {
           guestEntry = Row(
             children: <Widget>[
               Container(child: Text(guest.name)),
+              SizedBox(width: 10),
               Container(child: Text('Not confirmed yet')),
             ],
           );
@@ -160,6 +179,7 @@ class _EventDetailsState extends State<EventDetails> {
           guestEntry = Row(
             children: <Widget>[
               Container(child: Text(guest.name)),
+              SizedBox(width: 10),
               Container(child: Text('Not Attending')),
             ],
           );
@@ -168,7 +188,8 @@ class _EventDetailsState extends State<EventDetails> {
           guestEntry = Row(
             children: <Widget>[
               Container(child: Text(guest.name)),
-              Container(child: Text('Not confirmed yet')),
+              SizedBox(width: 10),
+              Container(child: Text('Attending')),
             ],
           );
           break;
@@ -176,6 +197,7 @@ class _EventDetailsState extends State<EventDetails> {
           guestEntry = Row(
             children: <Widget>[
               Container(child: Text(guest.name)),
+              SizedBox(width: 10),
               Container(child: Text('Not confirmed yet')),
             ],
           );

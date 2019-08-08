@@ -7,7 +7,7 @@ part 'guest.g.dart';
 class Guest {
   final String name;
   final User user;
-  final int isAttending;
+  int isAttending;
 
   Guest({this.name, this.user, this.isAttending});
 
