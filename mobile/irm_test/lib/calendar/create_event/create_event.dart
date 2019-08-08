@@ -72,6 +72,7 @@ class _CreateEventState extends State<CreateEvent> {
               updater: _createEventBloc.updateEventDescription,
             ),
             _dateFields(
+              stream: _createEventBloc.date,
               startOrEndDate: 'start date',
               updaterDate: _createEventBloc.updateEventStartDate,
               startOrEndTime: 'start time',
@@ -79,6 +80,7 @@ class _CreateEventState extends State<CreateEvent> {
             ),
             SizedBox(height: 20),
             _dateFields(
+              stream: _createEventBloc.date,
               startOrEndDate: 'end date',
               updaterDate: _createEventBloc.updateEventEndDate,
               startOrEndTime: 'end time',
@@ -105,22 +107,27 @@ class _CreateEventState extends State<CreateEvent> {
   }
 
   Widget _dateFields(
-      {@required String startOrEndDate,
+      {@required Stream stream,
+      @required String startOrEndDate,
       @required Function updaterDate,
       @required startOrEndTime,
       @required Function updaterTime}) {
     return Row(
       children: <Widget>[
-        Expanded(
-          child: FieldDate(
-            format: '00/00/0000',
-            controlLength: 10,
-            hintTextKey: DateFormat('dd/MM/yyyy').format(DateTime.now()),
-            labelTextKey: startOrEndDate,
-            userData: '',
-            updater: updaterDate,
-          ),
-        ),
+        StreamedWidget(
+            stream: stream,
+            builder: (context, snapshot) {
+              return Expanded(
+                child: FieldDate(
+                  format: '00/00/0000',
+                  controlLength: 10,
+                  hintTextKey: DateFormat('dd/MM/yyyy').format(DateTime.now()),
+                  labelTextKey: startOrEndDate,
+                  userData: snapshot.data,
+                  updater: updaterDate,
+                ),
+              );
+            }),
         SizedBox(width: 5),
         Expanded(
           child: FieldDate(

@@ -48,6 +48,8 @@ class AgendaBloc {
   var _selectedEvent = StreamedValue<Event>();
   var _selectedExtendedEvent = StreamedValue<ExtendedEvent>();
   var _notifyEventsUpdated = StreamedValue<bool>();
+  var _dateToDisplayInCreateForm = StreamedValue<DateTime>()
+    ..inStream(DateTime.now());
 
   Stream<Map<DateTime, List>> get events => _eventsToDisplay.outStream;
   Stream<DateTime> get today => _today.outStream;
@@ -58,6 +60,11 @@ class AgendaBloc {
   Stream get phoneEvents => _eventsFromPhone.outStream;
 
   Stream get updateStream => _notifyEventsUpdated.outStream;
+  Stream get dateToDisplayInCreateForm => _dateToDisplayInCreateForm.outStream;
+
+  void setDateToDisplayOnCreateForm(DateTime date) {
+    _dateToDisplayInCreateForm.value = date;
+  }
 
   void notifyEventUpdate(bool ping) {
     _notifyEventsUpdated.value = ping;

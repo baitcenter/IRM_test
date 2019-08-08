@@ -78,6 +78,7 @@ class _InAppCalendarState extends State<InAppCalendar>
   void _onDaySelected(DateTime day, List events) {
     print('CALLBACK: _onDaySelected');
     print(day);
+    _agendaBloc.setDateToDisplayOnCreateForm(day);
     setState(() {
       _selectedEvents = events;
     });

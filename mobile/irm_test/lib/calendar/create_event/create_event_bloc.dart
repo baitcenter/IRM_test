@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:device_calendar/device_calendar.dart';
 import 'package:frideos_core/frideos_core.dart';
+import 'package:intl/intl.dart';
 import 'package:irm_test/services.dart';
 import 'package:irm_test/z_blocs/agenda_bloc.dart';
 import 'package:irm_test/z_services/calendar_service/extended_event.dart';
@@ -16,7 +19,14 @@ class CreateEventBloc {
     this.agendaBloc,
   ) {
     getAllUsersFromDB();
+
+    dateToDisplayInForm = agendaBloc.dateToDisplayInCreateForm.listen((date) {
+      var dateAsString = DateFormat('dd/MM/yyyy').format(date);
+      _dateAsString.value = dateAsString;
+    });
   }
+
+  StreamSubscription dateToDisplayInForm;
 
   var _allUsers = StreamedValue<List<User>>();
   var _eventTitle = StreamedValue<String>()..inStream('');
@@ -30,6 +40,7 @@ class CreateEventBloc {
   var _attendeeNames = StreamedValue<List<String>>();
   var _selectedAttendees = StreamedValue<List<User>>()..inStream(List<User>());
   var _eventToSend = StreamedValue<Event>();
+  var _dateAsString = StreamedValue<String>();
 
   Stream<List<User>> get allUsers => _allUsers.outStream;
 
@@ -37,6 +48,7 @@ class CreateEventBloc {
   Stream<String> get eventLocation => _eventLocation.outStream;
   Stream<List<Attendee>> get attendees => _eventAttendees.outStream;
   Stream<List<String>> get attendeeNames => _attendeeNames.outStream;
+  Stream<String> get date => _dateAsString.outStream;
 
   void getAllUsersFromDB() async {
     try {
@@ -141,13 +153,15 @@ class CreateEventBloc {
   }
 
   void createEventInDbAndLocally(String calendarId) async {
-    var createdLocally = await createEvent(calendarId);
+    await createEvent(calendarId);
+    await createEventInDb();
+    agendaBloc.notifyEventUpdate(true);
+    /* var createdLocally = await createEvent(calendarId);
     if (createdLocally) {
       await createEventInDb();
       agendaBloc.notifyEventUpdate(true);
       return;
-    }
-    print('error creating event in calendar and DB');
+    }*/
   }
 
   void testStreams() {
@@ -235,5 +249,6 @@ class CreateEventBloc {
     _eventAttendees.dispose();
     _eventToSend.dispose();
     _selectedAttendees.dispose();
+    dateToDisplayInForm.cancel();
   }
 }
