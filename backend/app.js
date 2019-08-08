@@ -105,7 +105,7 @@ app.post('/updateevent', (req, res) => {
     let reqBody=req.body;
     console.log (reqBody);
     try {
-       result =  myDB.collection('calendar').replaceOne({$and:[{"event.eventId":reqBody.event.eventId},{"owner.userName":reqBody.owner.userName}]},reqBody);
+       result =  myDB.collection('calendar').replaceOne({$and:[{"event.title":reqBody.event.title},{"owner.userName":reqBody.owner.userName}]},reqBody);
         res.status(200);
         console.log('event updated');
         res.send('event updated');
