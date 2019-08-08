@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
+import 'package:intl/intl.dart';
 import 'package:irm_test/calendar/event_details/event_details_bloc.dart';
 import 'package:irm_test/services.dart';
 import 'package:irm_test/utils/utils.dart';
@@ -7,6 +8,7 @@ import 'package:irm_test/z_blocs/agenda_bloc.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_blocs/bloc_provider.dart';
 import 'package:irm_test/z_services/calendar_service/extended_event.dart';
+import 'package:irm_test/z_services/calendar_service/guest.dart';
 
 class EventDetails extends StatefulWidget {
   final ExtendedEvent extendedEvent;
@@ -51,14 +53,30 @@ class _EventDetailsState extends State<EventDetails> {
       body: SafeArea(
         child: ListView(
           children: <Widget>[
-            Container(child: Text('TITLE')),
-            Container(child: Text('LOCATION')),
-            Container(child: Text('DESCRIPTION')),
-            Container(child: Text('START DATE')),
-            Container(child: Text('START TIME')),
-            Container(child: Text('END DATE')),
-            Container(child: Text('END TIME')),
-            Container(child: Text('ATTENDEES WITH STATUS')),
+            ListTile(
+                title: Text(widget.extendedEvent.event.title),
+                leading: Text('Title')),
+            ListTile(title: Text('LOCATION')),
+            ListTile(
+                title: Text(widget.extendedEvent.event.description),
+                leading: Text('Description')),
+            ListTile(
+                title: Text(DateFormat('dd/MM/yyyy')
+                    .format(widget.extendedEvent.event.start)),
+                leading: Text('Start Date')),
+            ListTile(
+                title: Text(DateFormat('HH:mm')
+                    .format(widget.extendedEvent.event.start)),
+                leading: Text('Start Time')),
+            ListTile(
+                title: Text(DateFormat('dd/MM/yyyy')
+                    .format(widget.extendedEvent.event.end)),
+                leading: Text('End Date')),
+            ListTile(
+                title: Text(
+                    DateFormat('HH:mm').format(widget.extendedEvent.event.end)),
+                leading: Text('End Time')),
+            ListTile(title: _attendeeList(), leading: Text('Attendees')),
             _updateButton(context),
           ],
         ),
@@ -83,11 +101,87 @@ class _EventDetailsState extends State<EventDetails> {
           }
           return Column(
             children: <Widget>[
-              Container(child: Text('Participation status')),
+              ListTile(
+                leading: Text('Your RSVP'),
+                title: _rsvp(widget.extendedEvent.guests, snapshot.data),
+              ),
               RaisedButton(child: Text('Accept')),
               RaisedButton(child: Text('Decline')),
             ],
           );
         });
+  }
+
+  Widget _rsvp(List<Guest> guests, User user) {
+    var userAsGuest = guests.firstWhere((guest) {
+      return guest.name == user.userName;
+    });
+
+    String rsvp;
+    switch (userAsGuest.isAttending) {
+      case 1:
+        rsvp = 'To be confirmed';
+        break;
+      case 2:
+        rsvp = 'Not attending';
+        break;
+      case 3:
+        rsvp = 'Attending';
+        break;
+      default:
+        rsvp = 'To be confirmed';
+        break;
+    }
+    return Text(rsvp);
+  }
+
+  Widget _attendeeList() {
+    var attendees = widget.extendedEvent.guests;
+    return Column(
+      children: attendees.isNotEmpty
+          ? _buildAttendeeList(attendees)
+          : <Widget>[Text('No Guests for this event')],
+    );
+  }
+
+  List<Widget> _buildAttendeeList(List<Guest> guests) {
+    return guests.map((guest) {
+      Widget guestEntry;
+      switch (guest.isAttending) {
+        case 1:
+          guestEntry = Row(
+            children: <Widget>[
+              Container(child: Text(guest.name)),
+              Container(child: Text('Not confirmed yet')),
+            ],
+          );
+          break;
+        case 2:
+          guestEntry = Row(
+            children: <Widget>[
+              Container(child: Text(guest.name)),
+              Container(child: Text('Not Attending')),
+            ],
+          );
+          break;
+        case 3:
+          guestEntry = Row(
+            children: <Widget>[
+              Container(child: Text(guest.name)),
+              Container(child: Text('Not confirmed yet')),
+            ],
+          );
+          break;
+        default:
+          guestEntry = Row(
+            children: <Widget>[
+              Container(child: Text(guest.name)),
+              Container(child: Text('Not confirmed yet')),
+            ],
+          );
+          break;
+      }
+      return guestEntry;
+    }).toList();
   }
 }
