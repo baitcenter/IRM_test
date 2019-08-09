@@ -8,8 +8,8 @@ import 'package:irm_test/services.dart';
 void main() {
   var authService = AuthServiceFirebase();
   //var calendarService = CalendarServiceFake();
-  var calendarService = CalendarServiceBackend('a58af5f8.ngrok.io');
-  var userService = UserServiceHttp('a58af5f8.ngrok.io', authService);
+  var calendarService = CalendarServiceBackend('irm-test.quangson.ninja');
+  var userService = UserServiceHttp('irm-test.quangson.ninja', authService);
   var appBloc = AppBloc(authService, userService);
   var agendaBloc = AgendaBloc(
     calendarService,
