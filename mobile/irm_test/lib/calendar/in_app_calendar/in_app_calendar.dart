@@ -170,6 +170,13 @@ class _InAppCalendarState extends State<InAppCalendar>
             _goToCreateEvent(context);
           },
         ),
+        const SizedBox(height: 8.0),
+        RaisedButton(
+          child: Text('test'),
+          onPressed: () {
+            _agendaBloc.upDateStreamForDisplay();
+          },
+        ),
       ],
     );
   }
