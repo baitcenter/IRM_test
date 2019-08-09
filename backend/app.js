@@ -4,7 +4,7 @@ const app = express();
 const dotenv = require('dotenv').config();
 
 //please secure this
-let url = "mongodb://master:ceM7kFQCWkdLZcUEXkDaKhkg@ds016108.mlab.com:16108/test-irm";
+let url = process.env.URL;
 const port = process.env.PORT || 80;
 
 var myDB;//global var for the DB, not so clean
