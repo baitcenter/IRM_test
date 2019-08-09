@@ -177,18 +177,23 @@ class _InAppCalendarState extends State<InAppCalendar>
           ],
         ),
         const SizedBox(height: 8.0),
-        RaisedButton(
-          child: Text('create meeting'),
-          onPressed: () {
-            _goToCreateEvent(context);
-          },
-        ),
-        const SizedBox(height: 8.0),
-        RaisedButton(
-          child: Text('test'),
-          onPressed: () {
-            _agendaBloc.upDateStreamForDisplay();
-          },
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            RaisedButton(
+              child: Text('create meeting'),
+              onPressed: () {
+                _goToCreateEvent(context);
+              },
+            ),
+            const SizedBox(width: 8.0),
+            RaisedButton(
+              child: Text('Synchronize Data'),
+              onPressed: () {
+                _agendaBloc.upDateStreamForDisplay();
+              },
+            ),
+          ],
         ),
       ],
     );
