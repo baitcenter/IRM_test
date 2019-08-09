@@ -62,7 +62,7 @@ class CalendarServiceBackend extends CalendarService {
 
   @override
   Future<bool> createEventInDB(ExtendedEvent event) async {
-    Uri uri = Uri.https(host, '/createEvent');
+    Uri uri = Uri.http(host, '/createEvent');
 
     print('creating event in DB');
     var response = await http.post(uri,
@@ -79,7 +79,7 @@ class CalendarServiceBackend extends CalendarService {
 
   @override
   Future<List<ExtendedEvent>> getEventsFromDB(User user) async {
-    Uri uri = Uri.https(host, '/getevents');
+    Uri uri = Uri.http(host, '/getevents');
 
     var response = await http.post(uri,
         headers: {
@@ -101,7 +101,7 @@ class CalendarServiceBackend extends CalendarService {
   }
 
   Future<bool> updateEventInDB(ExtendedEvent extendedEvent) async {
-    Uri uri = Uri.https(host, '/updateevent');
+    Uri uri = Uri.http(host, '/updateevent');
 
     var response = await http.post(
       uri,
@@ -123,7 +123,7 @@ class CalendarServiceBackend extends CalendarService {
       'eventId': extendedEvent.event.eventId,
       'user': extendedEvent.owner.userName
     };
-    Uri uri = Uri.https(host, '/deleteevent', queryParameters);
+    Uri uri = Uri.http(host, '/deleteevent', queryParameters);
 
     var response = await http.delete(
       uri,

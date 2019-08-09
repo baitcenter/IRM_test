@@ -46,7 +46,7 @@ class UserServiceHttp extends UserService {
 
   @override
   Future<List<User>> getAllUsers() async {
-    Uri uri = Uri.https(host, '/getallusers');
+    Uri uri = Uri.http(host, '/getallusers');
     var response =
         await http.get(uri, headers: {'Content-Type': 'application/json'});
 
@@ -70,7 +70,7 @@ class UserServiceHttp extends UserService {
   Future<bool> createUser(String userName, Calendar calendar) async {
     var firebaseUser = await authService.getCurrentUser();
 
-    Uri uri = Uri.https(host, '/createuser');
+    Uri uri = Uri.http(host, '/createuser');
 
     var calendarJson = calendar.toJson();
 
