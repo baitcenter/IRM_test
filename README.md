@@ -30,19 +30,19 @@ For the backend, the company uses Meteor, which I have never worked with, and co
 3. **App features**
 - Calendar displaying list of events for each day
 - Login with phone number
-- create events through the app that are also written in your phone
-- invite other users to your event. The event is created in their phone as well
-- guests: accept or decline to attend to events
-- event owner: delete event
+- Create events through the app that are also written in your phone
+- Invite other users to your event. The event is created in their phone as well
+- Guests: accept or decline to attend to events
+- Event owner: delete event
 
 4. **Known bugs** 
 
 - logging out of Firebase then logging back in without closing the app will cause it to crash
 - events created are shown on the event list, but no bullet is created on the calendar unless the app is closed and relaunched.
-- past events can't be deleted from phone through the app
-- wrong date format from user can cause bugs.
-- synchonization with DB will bring user back to calendar page
-- wrong label for calendar display: label says "2 weeks" when month is displayed and vice-versa
+- Past events can't be deleted from phone through the app
+- Wrong date format from user can cause bugs.
+- Synchonization with DB will bring user back to calendar page
+- Wrong label for calendar display: label says "2 weeks" when month is displayed and vice-versa
 
 5. **Process**
 
@@ -51,7 +51,7 @@ My first priority was to deliver something within the deadline. I tried to limit
 
 I identified the minimum requirements of the tool: create events and sync between phones, invite guests with possibility to rsvp, delete events, which gave me the skeleton of the app. Other nice to have features would come if time allowed it, but I took some into account early on, e.g. reprogram a cancelled event, in order to design the app architecture accordingly.
 
-6. Result
+6. **Result**
 
 The apk file was sent on August 9 at 16:21. Since I'm not yet part of the Apple Developer program, I could build an iOS executable, so I'll have to showcase the iOS version on the simulator when I go the company.
 
