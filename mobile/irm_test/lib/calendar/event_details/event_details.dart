@@ -56,7 +56,6 @@ class _EventDetailsState extends State<EventDetails> {
             ListTile(
                 title: Text(widget.extendedEvent.event.title),
                 leading: Text('Title')),
-            ListTile(title: Text('LOCATION')),
             ListTile(
                 title: Text(widget.extendedEvent.event.description),
                 leading: Text('Description')),

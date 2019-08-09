@@ -30,12 +30,7 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.blue,
-          title: Text('Hello'),
-          //TO DO: remove button from sign in screen
-          leading: RaisedButton(
-            child: Text('sign out'),
-            onPressed: bloc.signOut,
-          ),
+          title: Text('iReachM test'),
         ),
         body: StreamedWidget(
             noDataChild: Container(color: Colors.pink),
@@ -69,8 +64,7 @@ class _HomePageState extends State<HomePage> {
                   page = Container(
                       color: Colors.grey,
                       child: Center(
-                        child: Text(
-                            'If you work hard, your dreams still may not come true'),
+                        child: Text('Oops, something has gone  wrong'),
                       ));
                   break;
               }

@@ -30,12 +30,10 @@ class _AgendaState extends State<Agenda> {
     super.didChangeDependencies();
     _agendaBloc ??= BlocProvider.of(context).agendaBloc;
     _agendaBloc.setToday(today);
-    _eventsListener ??= _agendaBloc.events.listen((events) {});
   }
 
   @override
   void dispose() {
-    _eventsListener.cancel();
     _agendaBloc.dispose();
     super.dispose();
   }

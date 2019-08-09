@@ -120,8 +120,7 @@ class _InAppCalendarState extends State<InAppCalendar>
         builder: (context, snapshot) {
           return TableCalendar(
             calendarController: _calendarController,
-            events: snapshot.data,
-            // holidays: widget._holidays,
+            events: snapshot.data != null ? snapshot.data : {},
             startingDayOfWeek: StartingDayOfWeek.monday,
             calendarStyle: CalendarStyle(
               selectedColor: Colors.deepOrange[400],

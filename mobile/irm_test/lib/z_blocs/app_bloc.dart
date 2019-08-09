@@ -168,6 +168,10 @@ class AppBloc {
   Future<bool> createUserInDB() async {
     try {
       await userService.createUser(_userName.value, _selectedCalendar.value);
+      print('user created');
+      var newUser = await userService.getUser();
+      _user.value = newUser;
+      print("new user fetched: ${_user.value.userName}");
       return true;
     } catch (e) {
       print('error creating user: $e');
@@ -213,4 +217,4 @@ class AppBloc {
   }
 }
 
-enum StartUp { login, confirm, calendarSelect, userNameSelect, agenda }
+enum StartUp { welcome, login, confirm, calendarSelect, userNameSelect, agenda }

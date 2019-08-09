@@ -36,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return SafeArea(
         child: Scaffold(
       body: Container(
-        color: Colors.yellow,
         child: Column(
           children: <Widget>[
             Spacer(flex: 1),
