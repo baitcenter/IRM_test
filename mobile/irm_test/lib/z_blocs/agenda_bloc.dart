@@ -18,18 +18,18 @@ class AgendaBloc {
     });
 
     //fetch events from phone and DB and pass data into streams
-    checkToday = today.listen((today) {
-      selectedCalendar = _appBloc.selectedCalendar.listen((calendar) {
+    checkToday = today.listen((today) async {
+      selectedCalendar = _appBloc.selectedCalendar.listen((calendar) async {
         _selectedCalendar.value = calendar;
-        prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
-        Timer.periodic(Duration(seconds: 300), (timer) {
-          prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
+        await prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
+        Timer.periodic(Duration(seconds: 300), (timer) async {
+          await prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
         });
       });
     });
 
-    notifyUpdate = updateStream.listen((ping) {
-      prepareEventsForDisplayAndUpdatePhone(
+    notifyUpdate = updateStream.listen((ping) async {
+      await prepareEventsForDisplayAndUpdatePhone(
           _today.value, _selectedCalendar.value.id);
     });
   }
@@ -58,6 +58,11 @@ class AgendaBloc {
   Stream get phoneEvents => _eventsFromPhone.outStream;
 
   Stream get updateStream => _notifyEventsUpdated.outStream;
+
+  void upDateStreamForDisplay() {
+    prepareEventsForDisplayAndUpdatePhone(
+        _today.value, _selectedCalendar.value.id);
+  }
 
   void notifyEventUpdate(bool ping) {
     _notifyEventsUpdated.value = ping;
@@ -101,23 +106,37 @@ class AgendaBloc {
     var today = _today.value;
     Map<DateTime, List> eventMap = {today: []};
     for (var event in eventList) {
+      print('converting event to map: ${event.title}');
+      print('date follows');
       if (compareDates(today, event.start)) {
         eventMap[today].add(event);
       }
     }
     //FIX: without this calendar only display events from DB for the current day
     for (var event in eventList) {
-      var date = DateFormat('yyy-MM-dd').format(event.start);
+      var date = DateFormat('yyyy-MM-dd').format(event.start);
       var day = DateTime.parse(date + ' 00:00:00.000');
-      var dateOfToday = DateFormat('yyy-MM-dd').format(today);
+      var dateOfToday = DateFormat('yyyy-MM-dd').format(today);
       if (date != dateOfToday) {
         if (eventMap[day] == null) {
           eventMap[day] = [];
         }
         eventMap[day].add(event);
+        print('added to map ${event.title}');
       }
     }
     return eventMap;
+  }
+
+  Future<void> prepareEventsForDisplayAndUpdatePhone(
+      DateTime today, String calendarId) async {
+    await fetchEventsFromPhoneAndDb(today, calendarId);
+    List<Event> eventsList = filterDbEvents(_eventsFromDB.value, _user.value);
+
+    Map<DateTime, List> eventsMap = convertListToMap(eventsList);
+
+    _eventsToDisplay.value = eventsMap;
+    await updatePhoneCalendar(_eventsFromDB.value, _eventsFromPhone.value);
   }
 
   Future<List<ExtendedEvent>> getEventsFromDB(User user) async {
@@ -128,18 +147,6 @@ class AgendaBloc {
       print('problem with events API call: $e');
     }
     return eventsFromDB;
-  }
-
-  void prepareEventsForDisplayAndUpdatePhone(
-      DateTime today, String calendarId) async {
-    fetchEventsFromPhoneAndDb(today, calendarId).then((_) {
-      List<Event> eventsList = filterDbEvents(_eventsFromDB.value, _user.value);
-
-      Map<DateTime, List> eventsMap = convertListToMap(eventsList);
-
-      _eventsToDisplay.value = eventsMap;
-      updatePhoneCalendar(_eventsFromDB.value, _eventsFromPhone.value);
-    });
   }
 
   Future<bool> fetchEventsFromPhoneAndDb(
@@ -167,7 +174,7 @@ class AgendaBloc {
     return eventsList;
   }
 
-  void updatePhoneCalendar(
+  Future<void> updatePhoneCalendar(
       List<ExtendedEvent> fromDB, List<Event> fromPhone) async {
     for (var dbEvent in fromDB) {
       if (dbEvent.owner.uid == _user.value.uid) {
@@ -209,7 +216,6 @@ class AgendaBloc {
 
   bool compareDates(DateTime today, DateTime event) {
     var todayDate = DateFormat('yyyy-MM-dd').format(today);
-    print(todayDate);
     var eventDate = DateFormat('yyyy-MM-dd').format(event);
     print(eventDate);
 
