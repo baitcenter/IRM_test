@@ -5,7 +5,7 @@ const dotenv = require('dotenv').config();
 
 //please secure this
 let url = "mongodb://master:ceM7kFQCWkdLZcUEXkDaKhkg@ds016108.mlab.com:16108/test-irm";
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 80;
 
 var myDB;//global var for the DB, not so clean
 
