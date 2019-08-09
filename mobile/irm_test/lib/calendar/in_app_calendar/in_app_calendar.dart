@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
+import 'package:intl/intl.dart';
 import 'package:irm_test/calendar/create_event/create_event.dart';
 import 'package:irm_test/calendar/event_details/event_details.dart';
 import 'package:irm_test/z_blocs/agenda_bloc.dart';
@@ -27,6 +28,7 @@ class _InAppCalendarState extends State<InAppCalendar>
   CalendarController _calendarController;
   AgendaBloc _agendaBloc;
   StreamSubscription _eventsListener;
+  Map<DateTime, List> _events;
 
   @override
   void initState() {
@@ -53,6 +55,7 @@ class _InAppCalendarState extends State<InAppCalendar>
     }*/
     _agendaBloc ??= BlocProvider.of(context).agendaBloc;
     _eventsListener ??= _agendaBloc.events.listen((events) {
+      _events = events;
       if (events[widget.today] == null) {
         setState(() {
           _selectedEvents = [];
@@ -62,6 +65,8 @@ class _InAppCalendarState extends State<InAppCalendar>
         setState(() {
           _selectedEvents = events[widget.today];
           print("_selectedEvents updated: not empty");
+
+          print('controller updated');
         });
       }
     });
@@ -78,9 +83,17 @@ class _InAppCalendarState extends State<InAppCalendar>
   void _onDaySelected(DateTime day, List events) {
     print('CALLBACK: _onDaySelected');
     print(day);
-    setState(() {
-      _selectedEvents = events;
-    });
+    var thisDay = DateFormat('yyyy-MM-dd').format(day);
+    var reformat = DateTime.parse(thisDay + ' 12:00:00.000Z');
+    print(reformat);
+    if (_events[reformat] == null) {
+      _selectedEvents = [];
+    } else {
+      _selectedEvents = _events[reformat];
+      print('new _events not null');
+    }
+
+    setState(() {});
   }
 
   @override

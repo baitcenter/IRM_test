@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
+import 'package:intl/intl.dart';
 import 'package:irm_test/calendar/in_app_calendar/in_app_calendar.dart';
 import 'package:irm_test/z_blocs/agenda_bloc.dart';
 import 'package:irm_test/z_blocs/bloc_provider.dart';
@@ -18,7 +19,10 @@ class _AgendaState extends State<Agenda> {
   @override
   void initState() {
     super.initState();
-    today = DateTime.now();
+    //today = DateTime.now();
+    var now = DateTime.now();
+    var nowString = DateFormat('yyyy-MM-dd').format(now);
+    today = DateTime.parse(nowString + ' 12:00:00.000Z');
   }
 
   @override
@@ -26,10 +30,7 @@ class _AgendaState extends State<Agenda> {
     super.didChangeDependencies();
     _agendaBloc ??= BlocProvider.of(context).agendaBloc;
     _agendaBloc.setToday(today);
-    print('today set');
-    _eventsListener ??= _agendaBloc.events.listen((events) {
-      print('events:$events');
-    });
+    _eventsListener ??= _agendaBloc.events.listen((events) {});
   }
 
   @override
