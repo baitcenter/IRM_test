@@ -4,6 +4,7 @@ import 'package:irm_test/startup/agenda/agenda.dart';
 import 'package:irm_test/startup/calendar_select/calendar_select.dart';
 import 'package:irm_test/startup/login/login_builder.dart';
 import 'package:irm_test/startup/login/login_screen.dart';
+import 'package:irm_test/startup/welcome/welcome.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_blocs/bloc_provider.dart';
 import 'package:irm_test/startup/username_select/username_select.dart';
@@ -31,6 +32,10 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           backgroundColor: Colors.blue,
           title: Text('iReachM test'),
+          centerTitle: true,
+          leading: RawMaterialButton(onPressed: () {
+            bloc.signOut();
+          }),
         ),
         body: StreamedWidget(
             noDataChild: Container(color: Colors.pink),
@@ -40,6 +45,9 @@ class _HomePageState extends State<HomePage> {
               switch (snapshot.data) {
 
                 ///TO DO add a start screen before a_startup.login
+                case StartUp.welcome:
+                  page = Welcome();
+                  break;
                 case StartUp.login:
                   page =
                       LoginPageBuilder(step: LoginSteps.phone, context: context)

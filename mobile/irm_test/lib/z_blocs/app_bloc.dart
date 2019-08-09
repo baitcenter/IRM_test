@@ -26,7 +26,7 @@ class AppBloc {
 
   StreamSubscription calendarStream;
 
-  var _currentStep = StreamedValue<StartUp>()..inStream(StartUp.login);
+  var _currentStep = StreamedValue<StartUp>()..inStream(StartUp.welcome);
   //phone auth
   var _phoneNr = StreamedValue<String>()..inStream('');
   var _verificationId = StreamedValue<String>();
@@ -96,6 +96,7 @@ class AppBloc {
           verificationId: _verificationId.value, smsCode: _sms.value);
     } catch (err) {
       print('error with confirmation code: ' + err);
+      defineStep(StartUp.welcome);
     }
     var hasPermission = await requestAccessToCalendar();
     if (!hasPermission) return;
@@ -113,9 +114,8 @@ class AppBloc {
   }
 
   void signOut() {
-    authService.signOut().then((_) {
-      defineStep(StartUp.login);
-    });
+    defineStep(StartUp.welcome);
+    authService.signOut();
     return;
   }
 
