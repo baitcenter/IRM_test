@@ -15,7 +15,7 @@ class UserServiceHttp extends UserService {
     var user = await authService.getCurrentUser();
     Map<String, String> queryParameters = {'uid': user.uid};
 
-    Uri uri = Uri.https(host, '/getuser', queryParameters);
+    Uri uri = Uri.http(host, '/getuser', queryParameters);
 
     var response =
         await http.get(uri, headers: {'Content-Type': 'application/json'});
