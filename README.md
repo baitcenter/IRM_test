@@ -47,7 +47,7 @@ For the backend, the company uses Meteor, which I have never worked with, and co
 5. **Process**
 
 Given the timeframe and the context, I wanted to chose a stack that matched the company as much as possible, while trying to use technologies I had at least some previous contact with.
-My first priority was to deliver something within the deadline. I tried to limit the "learning on the spot" so I used a library (Table Calendar) to implement the in-app calendar and another (Device Calendar) to read/write events in the phone calendars. Libraries are always a bit of a gamble - combining 2 you have not used before even moreso - but it seemed a safer bet than learning to communicate with calendars on both iOS and Android while designing and coding the whole app.
+My first priority was to deliver something within the deadline. I tried to limit the "learning on the spot" so I used a library ([Table Calendar]("https://pub.dev/packages/table_calendar")) to implement the in-app calendar and another ([Device Calendar]("https://pub.dev/packages/device_calendar")) to read/write events in the phone calendars. Libraries are always a bit of a gamble - combining 2 you have not used before even moreso - but it seemed a safer bet than learning to communicate with calendars on both iOS and Android while designing and coding the whole app.
 
 I identified the minimum requirements of the tool: create events and sync between phones, invite guests with possibility to rsvp, delete events, which gave me the skeleton of the app. Other nice to have features would come if time allowed it, but I took some into account early on, e.g. reprogram a cancelled event, in order to design the app architecture accordingly.
 
