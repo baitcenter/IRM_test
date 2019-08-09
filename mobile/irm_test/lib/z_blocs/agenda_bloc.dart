@@ -22,15 +22,19 @@ class AgendaBloc {
       selectedCalendar = _appBloc.selectedCalendar.listen((calendar) async {
         _selectedCalendar.value = calendar;
         await prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
-        Timer.periodic(Duration(seconds: 300), (timer) async {
+        print('event Map stream updated, initial');
+        Timer.periodic(Duration(seconds: 120), (timer) async {
           await prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
+          print('event Map stream updated by timer');
         });
       });
     });
 
     notifyUpdate = updateStream.listen((ping) async {
+      print('update stream triggered');
       await prepareEventsForDisplayAndUpdatePhone(
           _today.value, _selectedCalendar.value.id);
+      print('event Map stream updated');
     });
   }
   StreamSubscription selectedCalendar;
@@ -115,7 +119,7 @@ class AgendaBloc {
     //FIX: without this calendar only display events from DB for the current day
     for (var event in eventList) {
       var date = DateFormat('yyyy-MM-dd').format(event.start);
-      var day = DateTime.parse(date + ' 00:00:00.000');
+      var day = DateTime.parse(date + ' 12:00:00.000Z');
       var dateOfToday = DateFormat('yyyy-MM-dd').format(today);
       if (date != dateOfToday) {
         if (eventMap[day] == null) {
@@ -136,6 +140,8 @@ class AgendaBloc {
     Map<DateTime, List> eventsMap = convertListToMap(eventsList);
 
     _eventsToDisplay.value = eventsMap;
+    print('mapped events into stream');
+
     await updatePhoneCalendar(_eventsFromDB.value, _eventsFromPhone.value);
   }
 
