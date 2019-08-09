@@ -14,6 +14,7 @@ class AgendaBloc {
   AgendaBloc(this._calendarService, this._appBloc) {
     userListener = _appBloc.user.listen((user) {
       _user.value = user;
+      print('user set  ${user.userName}');
     });
 
     //fetch events from phone and DB and pass data into streams
@@ -171,49 +172,56 @@ class AgendaBloc {
   }
 
   List<Event> filterDbEvents(List<ExtendedEvent> fromDb, User user) {
-    List<Event> eventsList = List<Event>.from(fromDb.map((extendedEvent) {
-      return extendedEvent.event;
-    }));
-    //replace calendarId by user's to allow writing on phone
-    for (var e in eventsList) {
-      e.calendarId = _selectedCalendar.value.id;
+    if (fromDb != null) {
+      List<Event> eventsList = List<Event>.from(fromDb.map((extendedEvent) {
+        return extendedEvent.event;
+      }));
+      //replace calendarId by user's to allow writing on phone
+      for (var e in eventsList) {
+        e.calendarId = _selectedCalendar.value.id;
+      }
+      return eventsList;
     }
-    return eventsList;
+    return [];
   }
 
   Future<void> updatePhoneCalendar(
       List<ExtendedEvent> fromDB, List<Event> fromPhone) async {
-    for (var dbEvent in fromDB) {
-      if (dbEvent.owner.uid == _user.value.uid) {
-        var updated = await _calendarService.createEventInPhone(dbEvent.event);
-        print('event${dbEvent.event} updated: $updated');
-      }
-
-      Event invitation;
-      for (var guest in dbEvent.guests) {
-        if (guest.name == _user.value.userName) {
-          invitation = dbEvent.event;
+    print('fromDB :$fromDB');
+    if (fromDB != null) {
+      for (var dbEvent in fromDB) {
+        if (dbEvent.owner.uid == _user.value.uid) {
+          var updated =
+              await _calendarService.createEventInPhone(dbEvent.event);
+          print('event${dbEvent.event} updated: $updated');
         }
-      }
-      //if guest event exists on phone, delete and replace with version from DB
-      //else just create it
-      if (invitation != null) {
-        invitation.eventId = null;
-        for (var phoneEvent in fromPhone) {
-          //Add more conditions to avoid wrong results.
-          if (phoneEvent.title == invitation.title &&
-              phoneEvent.start == invitation.start) {
-            await _calendarService.deleteEventFromPhone(
-                _selectedCalendar.value.id, phoneEvent.eventId);
-            var createInvitation =
-                await _calendarService.createEventInPhone(invitation);
-            print(
-                'existing event recreated on phone:${invitation.title} : $createInvitation');
-          } else {
-            var createInvitation =
-                await _calendarService.createEventInPhone(invitation);
-            print(
-                ' new event created on phone:${invitation.title} : $createInvitation');
+
+        Event invitation;
+        for (var guest in dbEvent.guests) {
+          if (guest.name == _user.value.userName) {
+            invitation = dbEvent.event;
+          }
+        }
+        //if guest event exists on phone, delete and replace with version from DB
+        //else just create it
+        if (invitation != null) {
+          invitation.eventId = null;
+          for (var phoneEvent in fromPhone) {
+            //Add more conditions to avoid wrong results.
+            if (phoneEvent.title == invitation.title &&
+                phoneEvent.start == invitation.start) {
+              await _calendarService.deleteEventFromPhone(
+                  _selectedCalendar.value.id, phoneEvent.eventId);
+              var createInvitation =
+                  await _calendarService.createEventInPhone(invitation);
+              print(
+                  'existing event recreated on phone:${invitation.title} : $createInvitation');
+            } else {
+              var createInvitation =
+                  await _calendarService.createEventInPhone(invitation);
+              print(
+                  ' new event created on phone:${invitation.title} : $createInvitation');
+            }
           }
         }
       }
