@@ -6,7 +6,6 @@ import 'package:irm_test/services.dart';
 import 'package:irm_test/utils/utils.dart';
 import 'package:irm_test/z_blocs/app_bloc.dart';
 import 'package:irm_test/z_services/calendar_service/extended_event.dart';
-import 'package:irm_test/z_services/calendar_service/guest.dart';
 
 class AgendaBloc {
   final CalendarService _calendarService;
@@ -23,7 +22,7 @@ class AgendaBloc {
         _selectedCalendar.value = calendar;
         await prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
         print('event Map stream updated, initial');
-        Timer.periodic(Duration(seconds: 120), (timer) async {
+        Timer.periodic(Duration(seconds: 300), (timer) async {
           await prepareEventsForDisplayAndUpdatePhone(today, calendar.id);
           print('event Map stream updated by timer');
         });
@@ -63,9 +62,10 @@ class AgendaBloc {
 
   Stream get updateStream => _notifyEventsUpdated.outStream;
 
-  void upDateStreamForDisplay() {
-    prepareEventsForDisplayAndUpdatePhone(
+  void upDateStreamForDisplay() async {
+    await prepareEventsForDisplayAndUpdatePhone(
         _today.value, _selectedCalendar.value.id);
+    return;
   }
 
   void notifyEventUpdate(bool ping) {
@@ -86,6 +86,7 @@ class AgendaBloc {
   void removeEventFromStreams(Event event, ExtendedEvent extendedEvent) {
     _eventsFromDB.value.remove(extendedEvent);
     _eventsFromPhone.value.remove(event);
+    return;
   }
 
   ExtendedEvent retrieveExtendedEvent(Event event) {
