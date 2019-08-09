@@ -1,14 +1,14 @@
 # IRM_test
 calendar app being developed for job application @ ireachm.com
 
-1. Objective
+1. **Objective**
 
 "Build a way for us to create appointments in a calendar, you may choose mobile or web as a platform.
 We have no particular preference in the programming language that you use, but keep in mind that we use a particular technology stack at iReachm."
 
 Deadline was August 9 before end of business hours
 
-2. Stack
+2. **Stack**
 
 - Mobile app: Flutter
 
@@ -27,7 +27,7 @@ Given the stack at iReachM, Flutter was the obvious choice for the mobile app.
 
 For the backend, the company uses Meteor, which I have never worked with, and couldn't learn on the go given the time frame of the assignment. I chose to use Express, so we stay in the JS/NodeJs family, with a MongoDB Database, which is the type of DB used by Meteor.
 
-3. App features
+3. **App features**
 - Calendar displaying list of events for each day
 - Login with phone number
 - create events through the app that are also written in your phone
@@ -35,7 +35,7 @@ For the backend, the company uses Meteor, which I have never worked with, and co
 - guests: accept or decline to attend to events
 - event owner: delete event
 
-4. Known bugs 
+4. **Known bugs** 
 
 - logging out of Firebase then logging back in without closing the app will cause it to crash
 - events created are shown on the event list, but no bullet is created on the calendar unless the app is closed and relaunched.
@@ -44,7 +44,7 @@ For the backend, the company uses Meteor, which I have never worked with, and co
 - synchonization with DB will bring user back to calendar page
 - wrong label for calendar display: label says "2 weeks" when month is displayed and vice-versa
 
-5. Process
+5. **Process**
 
 Given the timeframe and the context, I wanted to chose a stack that matched the company as much as possible, while trying to use technologies I had at least some previous contact with.
 My first priority was to deliver something within the deadline. I tried to limit the "learning on the spot" so I used a library (Table Calendar) to implement the in-app calendar and another (Device Calendar) to read/write events in the phone calendars. Libraries are always a bit of a gamble - combining 2 you have not used before even moreso - but it seemed a safer bet than learning to communicate with calendars on both iOS and Android while designing and coding the whole app.
