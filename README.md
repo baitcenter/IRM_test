@@ -51,7 +51,7 @@ My first priority was to deliver something within the deadline. I tried to limit
 
 I identified the minimum requirements of the tool: create events and sync between phones, invite guests with possibility to rsvp, delete events, which gave me the skeleton of the app. Other nice to have features would come if time allowed it, but I took some into account early on, e.g. reprogram a cancelled event, in order to design the app architecture accordingly.
 
-6. Result
+6. **Result**
 
 The apk file was sent on August 9 at 16:21. Since I'm not yet part of the Apple Developer program, I could build an iOS executable, so I'll have to showcase the iOS version on the simulator when I go the company.
 
