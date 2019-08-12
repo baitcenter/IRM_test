@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "150869024481",
+    "firebase_url": "https://irm-test.firebaseio.com",
+    "project_id": "irm-test",
+    "storage_bucket": "irm-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150869024481:android:16c7e52aaa96d1ed",
+        "android_client_info": {
+          "package_name": "ninja.quangson.irm_test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "150869024481-ns38muhqamk0c5k35n72p0qol06hjrfr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ninja.quangson.irm_test",
+            "certificate_hash": "1e07b7ff975cad79001e11a81ad1b0a469745efd"
+          }
+        },
+        {
+          "client_id": "150869024481-451giar5sj8gu4sd12uhbstfdueb7or6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkycl7bMQpDVjkaBfYnzEYvH41IWOqjh8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150869024481-451giar5sj8gu4sd12uhbstfdueb7or6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "150869024481-p1btshuee6aoc8j0s649154hat8p51pi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ninja.quangson.irmTest"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
