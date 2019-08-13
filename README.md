@@ -40,6 +40,7 @@ For the backend, the company uses Meteor, which I have never worked with, and co
 - logging out of Firebase then logging back in without closing the app will cause it to crash
 - events created are shown on the event list, but no bullet is created on the calendar unless the app is closed and relaunched.
 - Past events can't be deleted from phone through the app
+- event won't be deleted in calendar if phone calendar is open while dleting the event in the app
 - Wrong date format from user can cause bugs.
 - Synchonization with DB will bring user back to calendar page
 - Wrong label for calendar display: label says "2 weeks" when month is displayed and vice-versa
