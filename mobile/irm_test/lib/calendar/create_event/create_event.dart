@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frideos/frideos.dart';
 import 'package:intl/intl.dart';
 import 'package:irm_test/calendar/create_event/create_event_bloc.dart';
+import 'package:irm_test/calendar/create_event/no_date_error.dart';
 import 'package:irm_test/services.dart';
 import 'package:irm_test/widgets/field_attendee.dart';
 import 'package:irm_test/widgets/field_date.dart';
@@ -150,13 +151,25 @@ class _CreateEventState extends State<CreateEvent> {
           return RaisedButton(
             child: Text('save event'),
             //TO DO: prevent multiple button presses for same event
-            onPressed: () {
-              _createEventBloc
+            onPressed: () async {
+              var eventReady = await _createEventBloc
                   .createEventInDbAndLocally(calendarSnapshot.data.id);
-              Navigator.of(context).pop();
+              if (eventReady) {
+                Navigator.of(context).pop();
+              } else {
+                print('nodate alert');
+                _goToError(context);
+              }
+              return null;
+
               //TO DO:Refactor: export in "builder"
             },
           );
         });
+  }
+
+  void _goToError(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => NoDateError()));
   }
 }
