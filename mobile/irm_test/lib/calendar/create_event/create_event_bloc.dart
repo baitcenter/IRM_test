@@ -22,10 +22,10 @@ class CreateEventBloc {
   var _eventTitle = StreamedValue<String>()..inStream('');
   var _eventLocation = StreamedValue<String>()..inStream('');
   var _eventDescription = StreamedValue<String>()..inStream('');
-  var _eventStartDate = StreamedValue<String>();
-  var _eventStartTime = StreamedValue<String>();
-  var _eventEndDate = StreamedValue<String>();
-  var _eventEndTime = StreamedValue<String>();
+  var _eventStartDate = StreamedValue<String>()..inStream('');
+  var _eventStartTime = StreamedValue<String>()..inStream('');
+  var _eventEndDate = StreamedValue<String>()..inStream('');
+  var _eventEndTime = StreamedValue<String>()..inStream('');
   var _eventAttendees = StreamedValue<List<Attendee>>();
   var _attendeeNames = StreamedValue<List<String>>();
   var _selectedAttendees = StreamedValue<List<User>>()..inStream(List<User>());
@@ -140,14 +140,21 @@ class CreateEventBloc {
     }
   }
 
-  void createEventInDbAndLocally(String calendarId) async {
+  Future<bool> createEventInDbAndLocally(String calendarId) async {
+    if (_eventStartDate.value == '' ||
+        _eventEndDate.value == '' ||
+        _eventStartTime.value == '' ||
+        _eventEndTime.value == '') {
+      return false;
+    }
     var createdLocally = await createEvent(calendarId);
     if (createdLocally) {
       await createEventInDb();
       agendaBloc.notifyEventUpdate(true);
-      return;
+      return true;
     }
     print('error creating event in calendar and DB');
+    return false;
   }
 
   void testStreams() {
